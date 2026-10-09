@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VibeRevise</title>
+<meta name="description" content="Fix the words in an HTML document without disturbing the markup.">
+<link rel="stylesheet" href="app.css">
+
+<!-- Installable: an icon on the home screen and its own window, rather than a
+     tab someone has to find again. iOS ignores the manifest's icons, hence the
+     apple-touch-icon; it also ignores theme_color, hence the meta. -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#f7f7fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1020" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="icons/icon192.png">
+<link rel="apple-touch-icon" href="icons/icon192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="VibeRevise">
+</head>
+<body>
+
+<header class="chrome">
+  <a class="brand" href="/" title="About VibeRevise">VibeRevise</a>
+  <div class="file" id="filename" hidden></div>
+  <div class="spacer"></div>
+  <button id="settings-open" class="btn" title="Your name and AI">Settings</button>
+  <button id="open" class="btn">Open</button>
+  <button id="save" class="btn primary" hidden disabled>Save</button>
+</header>
+
+<main id="stage">
+  <section class="welcome" id="welcome">
+    <h1>Fix the words. Keep the file.</h1>
+    <p class="lede">
+      Open an HTML document, click any text and type. What you save is the file
+      you opened, with only the words you changed replaced — the markup,
+      indentation, comments and entities all exactly as they were.
+    </p>
+
+    <button id="open-main" class="btn big primary">Open an HTML file</button>
+    <p class="drop-hint" id="drop-hint">or drop one anywhere on this page</p>
+
+    <section class="network">
+      <button id="net-toggle" class="btn" aria-expanded="false" aria-controls="net-form">
+        Open from a server on your network
+      </button>
+
+      <form id="net-form" hidden>
+        <label for="net-url">Address of a document on your network</label>
+        <input id="net-url" type="url" inputmode="url" autocomplete="url"
+               spellcheck="false" autocapitalize="off"
+               placeholder="http://192.168.1.10:8080/reports/plan.html">
+        <div class="net-row">
+          <button type="submit" class="btn primary">Open</button>
+          <span class="net-msg" id="net-msg"></span>
+        </div>
+        <p class="hint">
+          A NAS, a documents server, anything on your own network — a
+          <code>192.168.</code>, <code>10.</code> or <code>172.16–31.</code>
+          address, <code>localhost</code>, a <code>.local</code> name, or a
+          private mesh. Public websites are refused: the guarantee this tool
+          makes depends on re-reading the same bytes the browser parsed, which
+          does not hold for a page built fresh on every request.
+        </p>
+      </form>
+
+      <div id="recents-wrap" hidden>
+        <h2 class="recents-title">Opened before</h2>
+        <ul id="recents" class="recents"></ul>
+      </div>
+    </section>
+
+    <dl class="how">
+      <div>
+        <dt>Nothing is uploaded</dt>
+        <dd>Your document is opened and edited in this browser tab. It is not
+            sent anywhere — unless you turn on AI with your own key, and then
+            only the paragraphs you ask about, to the service you chose.</dd>
+      </div>
+      <div>
+        <dt id="save-story-title">Saving</dt>
+        <dd id="save-story">Checking what this browser allows…</dd>
+      </div>
+      <div>
+        <dt>What you can change</dt>
+        <dd>Words, and adding another paragraph, list or table like one already
+            there. Not layout, styling or images — that restraint is what keeps
+            the file intact.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <iframe id="frame" hidden title="The document you are editing"
+          sandbox="allow-same-origin"></iframe>
+</main>
+
+<div class="toast" id="toast" hidden></div>
+
+<dialog id="settings" class="settings" aria-labelledby="settings-title">
+  <form method="dialog" class="settings-body" id="settings-form">
+    <h2 id="settings-title">Settings</h2>
+
+    <label for="set-author">Your name</label>
+    <input id="set-author" maxlength="60" autocomplete="name"
+           placeholder="So people can see who wrote what">
+    <p class="hint">Signs your comments and the list of changes. Not a sign-in —
+       anyone can type any name.</p>
+
+    <h3 class="set-section" id="ai-section">AI suggestions <span class="opt">— optional</span></h3>
+    <p class="hint">Rewrites, proofreading and replies to comments, using your own
+       key. Off until you add one. Only the words of the paragraphs involved are
+       sent, only when you ask, straight from this browser to the address below;
+       nothing changes until you accept a suggestion.</p>
+
+    <label for="set-ai-provider">Provider</label>
+    <select id="set-ai-provider"></select>
+
+    <label for="set-ai-url">Address</label>
+    <input id="set-ai-url" type="url" spellcheck="false" autocapitalize="off" placeholder="https://…">
+
+    <label for="set-ai-model">Model</label>
+    <input id="set-ai-model" spellcheck="false" autocapitalize="off"
+           placeholder="The model name from your provider’s documentation">
+
+    <label for="set-ai-key">API key</label>
+    <input id="set-ai-key" type="password" spellcheck="false" autocapitalize="off"
+           autocomplete="off" placeholder="Paste your key">
+    <p class="hint" id="set-ai-hint"></p>
+
+    <fieldset class="ai-access">
+      <legend>What AI may do</legend>
+      <label class="choice"><input type="radio" name="ai-access" id="set-ai-read" value="read" checked>
+        <span><b>Read</b> — explains, reviews, replies to comments and suggests
+        edits. You make every change yourself.</span></label>
+      <label class="choice"><input type="radio" name="ai-access" id="set-ai-write" value="write">
+        <span><b>Read and write</b> — its suggested edits also get an
+        <b>Accept</b> button. Nothing changes until you press it.</span></label>
+    </fieldset>
+
+    <p class="hint">Kept in this browser’s storage for this app only — not synced,
+       never sent anywhere but the address above. The service must accept
+       requests from a web page; Anthropic, OpenAI, OpenRouter and Gemini do, and
+       a local server may need to be told to (for Ollama, <code>OLLAMA_ORIGINS</code>).</p>
+    <div class="settings-actions">
+      <button type="button" class="btn" id="set-ai-test">Test</button>
+      <button type="button" class="btn" id="set-ai-forget">Forget key</button>
+    </div>
+
+    <p class="hint" id="set-status" role="status"></p>
+
+    <div class="settings-actions">
+      <span class="spacer"></span>
+      <button type="button" class="btn" id="set-cancel">Cancel</button>
+      <button type="submit" class="btn primary" id="set-save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- The engine and the editor, exactly as the extension loads them. -->
+<script src="lib/tokenizer.js"></script>
+<script src="lib/splice.js"></script>
+<script src="lib/origins.js"></script>
+<script src="lib/mapping.js"></script>
+<script src="lib/islands.js"></script>
+<script src="lib/blocks.js"></script>
+<script src="lib/structures.js"></script>
+<script src="lib/comments.js"></script>
+<script src="lib/prompt.js"></script>
+<script src="lib/ai.js"></script>
+<script src="lib/rebase.js"></script>
+<script src="lib/editor.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

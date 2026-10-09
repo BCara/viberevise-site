@@ -1,0 +1,42 @@
+{
+  "name": "VibeRevise — fix the words, keep the file",
+  "short_name": "VibeRevise",
+  "description": "Edit the text of an HTML document and save it with the markup untouched.",
+  "id": "/app/",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7f7fb",
+  "theme_color": "#f7f7fb",
+  "icons": [
+    {
+      "src": "icons/icon192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "index.html",
+      "accept": {
+        "text/html": [
+          ".html",
+          ".htm",
+          ".xhtml"
+        ]
+      }
+    }
+  ]
+}
