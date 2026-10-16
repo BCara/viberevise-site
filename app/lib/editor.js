@@ -1,5 +1,5 @@
 /*
- * VibeRevise — edit mode.
+ * VibeRevise: edit mode.
  *
  * Turns the mapped text regions into editable islands, keeps what the user can
  * do inside them narrow enough that the markup cannot move, tracks history, and
@@ -20,8 +20,8 @@
  *   - Enter inserts a <br>. It stays inside the block it was pressed in: a
  *     paragraph gets a new line, not a new paragraph.
  *   - Enter at the end of a list item, Ctrl/Cmd+Enter, or the "+" that appears
- *     on hover adds an empty sibling block — another <p> after a <p>, another
- *     <li> after an <li> — carrying the same tag and class and nothing else.
+ *     on hover adds an empty sibling block: another <p> after a <p>, another
+ *     <li> after an <li>carrying the same tag and class and nothing else.
  *
  * An added block is a ZERO-LENGTH splice at a known offset, so it displaces
  * nothing: every byte that was in the file is still in the file. An added block
@@ -45,7 +45,7 @@
   var HISTORY_LIMIT = 500;
 
   /*
-   * The input types allowed to reach the document — a whitelist, not a
+   * The input types allowed to reach the document: a whitelist, not a
    * blacklist. Everything here only ever changes characters inside one text
    * node; anything not on the list is refused, including input types that do
    * not exist yet and the empty string Chrome hands back for ones it does not
@@ -80,7 +80,7 @@
 
   // Anything that is not printable text: the C0 controls (which includes the
   // U+0001 that stands for a <br> in an island's value) and DEL. Newline is
-  // deliberately absent — it is handled separately, as a line break.
+  // deliberately absent: it is handled separately, as a line break.
   var CONTROL_RE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 
   /*
@@ -89,7 +89,7 @@
    * In the extension that is the page the content script was injected into, so
    * it is the global `document` and always has been. In the web app it is an
    * iframe holding the user's file, and the editor is running in the app's
-   * document instead — a different window entirely. Everything below goes
+   * document instead: a different window entirely. Everything below goes
    * through these two rather than the globals, because the editor does not
    * necessarily run inside the document it edits.
    *
@@ -178,8 +178,8 @@
    * the page's own stylesheet knows nothing about, and a rule like
    * `span { color: red }` would otherwise repaint the user's document the
    * moment edit mode came on. Unsetting everything makes the wrapper visually
-   * nonexistent — inherited properties still inherit, everything else goes back
-   * to initial — and the affordances are then added back deliberately.
+   * nonexistent, inherited properties still inherit, everything else goes back
+   * to initial, and the affordances are then added back deliberately.
    */
   var ISLAND_CSS = [
     '[data-vr-island] { all: unset !important; display: inline !important; }',
@@ -547,7 +547,7 @@
     var name = FMT_NAME[kind];
     if (!island || !regionOf(island)) { flash('Select some words first, then ' + (kind === 'b' ? 'Bold' : 'Italic')); return false; }
     if (islandOf(range.endContainer) !== island) {
-      flash('Select words within one stretch of text \u2014 ' + name + ' cannot cross a link or other formatting');
+      flash('Select words within one stretch of text: ' + name + ' cannot cross a link or other formatting');
       return false;
     }
 
@@ -562,7 +562,7 @@
     if (s === e) { flash('Select the words to make ' + name + ' first'); return false; }
     var atS = marksAt(value, s), atE = marksAt(value, e);
     if (atS.join() !== atE.join()) {
-      flash('The selection starts and ends in different formatting \u2014 select inside it, or around all of it');
+      flash('The selection starts and ends in different formatting: select inside it, or around all of it');
       return false;
     }
 
@@ -606,7 +606,7 @@
     var item = makeUnwrap(el, kind);
     pushHistory({ kind: 'unwrap', item: item });
     setUnwrap(item, true);
-    flash('Took ' + FMT_NAME[kind] + ' off \u201c' + item.text.slice(0, 40) + '\u201d \u2014 the whole phrase, as it was in the file');
+    flash('Took ' + FMT_NAME[kind] + ' off \u201c' + item.text.slice(0, 40) + '\u201d: the whole phrase, as it was in the file');
     return true;
   }
 
@@ -731,7 +731,7 @@
   /*
    * The block a new structure should go after: whatever the user is in, then
    * whatever they are hovering, then the last block we can find an anchor for.
-   * Never nothing — the toolbar should not fail for want of a destination.
+   * Never nothing: the toolbar should not fail for want of a destination.
    */
   function currentBlock() {
     /*
@@ -823,7 +823,7 @@
     if (!tail.replace(EDGE, '') && !laterText) return null;
     if (!head.replace(EDGE, '') && !earlierText) return null;
     if (laterText || island.parentNode !== block) {
-      return { block: block, refuse: 'VibeRevise cannot split a paragraph inside or before its bold, italic or links — move the cursor past them' };
+      return { block: block, refuse: 'VibeRevise cannot split a paragraph inside or before its bold, italic or links: move the cursor past them' };
     }
     return {
       island: island, region: region, block: block,
@@ -833,7 +833,7 @@
   }
 
   /*
-   * Add a structure — a table, a list, a heading — after the current block.
+   * Add a structure, a table, a list, a heading, after the current block.
    *
    * Unlike addAfterBlock, which owns one element holding one run of text, this
    * owns a small tree holding several. The bookkeeping is arranged so the rest
@@ -932,7 +932,7 @@
     var what = Structures.kindById(id);
     flash(built.donor
       ? 'Added a ' + what.label.toLowerCase() + ' like the one above'
-      : 'Added a plain ' + what.label.toLowerCase() + ' — this document had none to copy');
+      : 'Added a plain ' + what.label.toLowerCase() + ': this document had none to copy');
     return tree;
   }
 
@@ -944,13 +944,13 @@
     return false;
   }
 
-  // A bullet or a numbered item — the one block Enter carries on from.
+  // A bullet or a numbered item: the one block Enter carries on from.
   function isListItem(block) {
     return !!block && block.localName === 'li';
   }
 
   // True when the caret sits at the very end of the last run of text in its
-  // block — the point at which Enter in a list item starts the next one rather
+  // block: the point at which Enter in a list item starts the next one rather
   // than breaking the line.
   function atEndOfBlock(island) {
     var value = Islands.readValue(island);
@@ -1041,7 +1041,7 @@
   }
 
   /*
-   * Several regions changed as one step — an accepted AI suggestion, which is
+   * Several regions changed as one step: an accepted AI suggestion, which is
    * one change to one paragraph however many runs of text it touched. Undo
    * puts every run back, and who did it and whether AI suggested it go back
    * with them.
@@ -1183,7 +1183,7 @@
         // attributes VibeRevise does not write. Bold and italic it does, above.
         flash('VibeRevise does bold and italic, but not that kind of formatting');
       } else if (type === 'insertFromDrop') {
-        flash('Drag and drop is not supported — copy and paste instead');
+        flash('Drag and drop is not supported: copy and paste instead');
       } else {
         flash('That kind of edit is not supported in VibeRevise');
       }
@@ -1259,7 +1259,7 @@
   function onDrop(e) {
     if (!state.active || !fromUser(e)) return;
     e.preventDefault();
-    flash('Drag and drop is not supported — copy and paste instead');
+    flash('Drag and drop is not supported: copy and paste instead');
   }
 
   function onDragOver(e) {
@@ -1294,15 +1294,14 @@
   }
 
   /*
-   * The added item the caret is in, if nothing has been typed into it — the
+   * The added item the caret is in, if nothing has been typed into it: the
    * whole of it, for a table: one empty cell in a table with words elsewhere
    * is not an empty table. A line break on its own is not text.
    *
    * Unlike pendingInsert(), any added item qualifies, however long ago it was
    * added: the user can click into an empty paragraph they added earlier and
    * press Delete to be rid of it. What never qualifies is anything that came
-   * from the file — those regions are kind 'text', not 'insert' or 'cell' —
-   * so no key press here can remove a single byte of the original document.
+   * from the file: those regions are kind 'text', not 'insert' or 'cell', so no key press here can remove a single byte of the original document.
    */
   function blank(value) {
     return !value || !Islands.plain(value).split(Islands.BR).join('').trim();
@@ -1356,7 +1355,7 @@
       }
     }
     if (liveComments().some(function (c) { return c.block === block; })) {
-      return { refuse: 'This ' + what + ' has a comment on it — delete the comment first' };
+      return { refuse: 'This ' + what + ' has a comment on it: delete the comment first' };
     }
 
     // The only item in a list goes with its list, rather than leaving an
@@ -1403,7 +1402,7 @@
       land.focus();
       Islands.setCaret(land, Islands.readValue(land).length);
     }
-    flash('Removed the empty ' + item.what + ' — Ctrl/Cmd+Z brings it back');
+    flash('Removed the empty ' + item.what + ': Ctrl/Cmd+Z brings it back');
     return item;
   }
 
@@ -1472,7 +1471,7 @@
       land.focus();
       Islands.setCaret(land, Islands.readValue(land).length);
     }
-    flash('Removed the ' + insertName(item) + ' \u2014 Ctrl/Cmd+Z brings it back');
+    flash('Removed the ' + insertName(item) + ': Ctrl/Cmd+Z brings it back');
   }
 
   function insertName(region) {
@@ -1493,7 +1492,7 @@
    * It matters now that it opens pages they did not: without this, a page can
    * forge Ctrl+S and raise a Save dialog nobody asked for, forge Ctrl+Z to
    * undo work, or forge beforeinput to put its own words into the document and
-   * have them recorded as the user's edit — which the user would then save.
+   * have them recorded as the user's edit, which the user would then save.
    *
    * state.trustSynthetic exists because the test suite can only produce
    * synthetic events. It is never set by the extension or the web app, and the
@@ -1558,7 +1557,7 @@
       }
     }
 
-    // Esc means "not that", so it only ever cancels the thing just inserted —
+    // Esc means "not that", so it only ever cancels the thing just inserted:
     // never an older one the user has come back to. Through undo(), so a
     // mistaken press is itself undoable.
     if (e.key === 'Escape') {
@@ -1725,7 +1724,7 @@
     });
 
     /*
-     * The + opens the list — a paragraph, a table, a heading — all inserted in
+     * The + opens the list, a paragraph, a table, a heading, all inserted in
      * the same place, which is the point of offering it from here rather than
      * only from the toolbar: the controls are already beside the block, so
      * there is no question of where the new thing goes.
@@ -1779,7 +1778,7 @@
    * The insert menu hanging off the hover controls.
    *
    * While it is open the controls must not be taken away, however far the
-   * pointer wanders — the user is reading a menu, not leaving.
+   * pointer wanders: the user is reading a menu, not leaving.
    */
   function setAddMenuOpen(open) {
     if (!state.add) return;
@@ -1857,7 +1856,7 @@
    * Park the buttons in the page's left margin, level with the block's first
    * line, so they never sit on the words. A block hard against the left edge
    * has no margin to use, and there falls back to a pill straddling the top
-   * edge — opaque, so it reads over whatever is underneath. Positioned in
+   * edge: opaque, so it reads over whatever is underneath. Positioned in
    * document coordinates so it stays put while the page scrolls.
    */
   function showAddFor(block) {
@@ -2012,7 +2011,7 @@
    *
    * Document order of the section each one is attached to, and within a
    * section the order they were written. That is what makes a reply a reply:
-   * nothing in the file marks one, and nothing needs to — a thread is simply
+   * nothing in the file marks one, and nothing needs to, a thread is simply
    * the notes that share a block, oldest first. Writing it this way means a
    * reply survives being read by anything that knows only what an HTML
    * comment is.
@@ -2086,7 +2085,7 @@
    * was last saved with. Those are not the same thing for a note that was
    * deleted: it used to count as unsaved for ever, because its text had been
    * recorded as saved while the fact of its removal never was, so the status
-   * bar claimed unsaved work after a save that had plainly succeeded — and
+   * bar claimed unsaved work after a save that had plainly succeeded, and
    * the unload warning went on firing on a file with nothing left to lose.
    */
   function commentUnsavedCount() {
@@ -2108,8 +2107,8 @@
   }
 
   /*
-   * Comments already in the file. Anything that is not one of ours — the
-   * boilerplate a generator left behind, a conditional comment — is left
+   * Comments already in the file. Anything that is not one of ours, the
+   * boilerplate a generator left behind, a conditional comment, is left
    * exactly where it is and never shown.
    */
   function buildComments() {
@@ -2217,8 +2216,8 @@
   }
 
   /*
-   * Move the switch. Nothing is written here — the next save is what rewrites
-   * the file — but every note that is in it immediately counts as unsaved, so
+   * Move the switch. Nothing is written here, the next save is what rewrites
+   * the file, but every note that is in it immediately counts as unsaved, so
    * the status bar and the margin say straight away that a save is pending
    * rather than letting a toggle look like it did nothing.
    */
@@ -2237,9 +2236,9 @@
       return commentInFile(r) !== null;
     }).length;
     flash(next
-      ? (n ? 'Comments will be visible in the file — save to rewrite ' + n + ' of them'
+      ? (n ? 'Comments will be visible in the file: save to rewrite ' + n + ' of them'
            : 'Comments will be saved as visible notes')
-      : (n ? 'Comments will be hidden again — save to rewrite ' + n + ' of them'
+      : (n ? 'Comments will be hidden again: save to rewrite ' + n + ' of them'
            : 'Comments will be saved as HTML comments, which no browser shows'));
   }
 
@@ -2277,7 +2276,7 @@
    * Without this, adding or deleting a comment rebuilds the margin, which
    * destroys the focused textarea, which fires blur, which files the typing as
    * a history step AFTER the structural one. Undo would then take back the
-   * typing instead of the deletion — the wrong thing, and confusingly so.
+   * typing instead of the deletion: the wrong thing, and confusingly so.
    */
   function flushCommentEdit() {
     if (!state.editingComment) return;
@@ -2290,7 +2289,7 @@
   /*
    * The cards live in a margin down the right-hand side, like a word processor.
    * Making room for it means widening the page's right padding while edit mode
-   * is on — a visible change to the layout, but a temporary one, and the file
+   * is on: a visible change to the layout, but a temporary one, and the file
    * never hears about it. The page's own inline style is put back on the way
    * out.
    */
@@ -2544,7 +2543,7 @@
             '<button class="p-save">Save</button>' +
           '</div>' +
           '<div class="p-hint" data-info hidden>Signs your comments and the list of ' +
-            'changes. Not a sign-in — anyone can type any name.</div>' +
+            'changes. Not a sign-in: anyone can type any name.</div>' +
           '<label class="p-check">' +
             '<input type="checkbox" class="p-show-comments">' +
             'Show comments in the document' +
@@ -2706,8 +2705,8 @@
     var unsaved = unsavedCount();
     var empty = emptyAddedCount() + emptyCommentCount();
 
-    // Counted the way the list of changes counts them — per paragraph, not per
-    // run of text — so the number on the bar and the number in the list agree.
+    // Counted the way the list of changes counts them, per paragraph, not per
+    // run of text, so the number on the bar and the number in the list agree.
     var shown = collectChanges().length || changed;
     var text = changed === 0
       ? 'no changes'
@@ -2807,7 +2806,7 @@
     var i, r;
 
     // Edits are grouped by block. A paragraph with bold in it is several runs
-    // of text, and one rewrite of it is one change to one paragraph — not one
+    // of text, and one rewrite of it is one change to one paragraph, not one
     // row per fragment, which reads as several unrelated edits.
     var byBlock = new Map();
     for (i = 0; i < state.regions.length; i++) {
@@ -3025,7 +3024,7 @@
       return false;
     }
     refresh();
-    flash('Undone — Ctrl/Cmd+Z brings it back');
+    flash('Undone: Ctrl/Cmd+Z brings it back');
     return true;
   }
 
@@ -3218,7 +3217,7 @@
     var head = doc().createElement('div');
     head.className = 's-what';
     var who = x.ai ? 'AI' + (x.model ? ' (' + x.model + ')' : '') : displayName(x.by);
-    head.textContent = x.kind === 'removed' ? 'You removed an empty block here, and the other tool has changed it since \u2014 it stays'
+    head.textContent = x.kind === 'removed' ? 'You removed an empty block here, and the other tool has changed it since: it stays'
       : x.kind === 'added' ? who + ' added this, where the file has since changed'
       : x.kind === 'comment' ? (x.by ? x.by + '’s' : 'A') + ' comment, where the file has since changed'
       : x.theirs != null ? who + ' and the other tool both changed this' : who + ' changed this, and the other tool rewrote or removed it';
@@ -3384,8 +3383,8 @@
    * answer can only ever land in the runs of text a person could have typed
    * into, so the markup is exactly as safe as it is from the keyboard.
    *
-   * What leaves the browser is the words of the paragraphs involved — split at
-   * their formatting, so the answer can go back without moving a tag — and,
+   * What leaves the browser is the words of the paragraphs involved, split at
+   * their formatting, so the answer can go back without moving a tag, and,
    * for a rewrite, a little of the text either side for context. Never the
    * file, never the markup.
    */
@@ -3406,7 +3405,7 @@
       '</div>' +
       '<div class="ai-status"></div>' +
       '<div class="ai-section ai-setup" hidden>' +
-        '<div class="p-hint">Use your own API key — Claude, OpenAI, Gemini, OpenRouter, or a ' +
+        '<div class="p-hint">Use your own API key: Claude, OpenAI, Gemini, OpenRouter, or a ' +
           'model running on your own computer. Nothing is sent until you ask for a ' +
           'suggestion, and nothing changes until you accept one.</div>' +
         '<button class="primary ai-setup-btn">Set up AI</button>' +
@@ -3578,7 +3577,7 @@
 
   /*
    * The runs of text that make up one block, in order: the islands whose own
-   * block is this one. A nested block — a list inside a section — is its own
+   * block is this one. A nested block, a list inside a section, is its own
    * paragraph, not part of its container's.
    */
   function runsOf(block) {
@@ -3644,7 +3643,7 @@
 
     return refreshAIStatus().then(function (st) {
       if (!st || !st.configured) {
-        flash('Set up AI first — ' + ((st && st.problem) || 'add your API key'));
+        flash('Set up AI first: ' + ((st && st.problem) || 'add your API key'));
         setAIOpen(true);
         return null;
       }
@@ -3663,7 +3662,7 @@
     if (!state.aiJob) return;
     state.aiJob.cancelled = true;
     state.aiJob = null;
-    flash('Cancelled — anything already on its way back will be ignored');
+    flash('Cancelled: anything already on its way back will be ignored');
     renderAI();
   }
 
@@ -3685,7 +3684,7 @@
   /*
    * A suggestion: the regions it covers, what they held when it was asked
    * for, and what it proposes. If any of them has changed since, it is stale
-   * and will not be applied — mapping an answer onto words the model never saw
+   * and will not be applied: mapping an answer onto words the model never saw
    * would be guessing.
    */
   function addSuggestion(kind, what, why, block, regions, after) {
@@ -3732,7 +3731,7 @@
     var regions = target.regions;
     var original = regions.map(function (r) { return r.current; });
     if (!AI.toModel(original.join('')).trim()) {
-      flash('That paragraph is empty — type something first');
+      flash('That paragraph is empty: type something first');
       return Promise.resolve(null);
     }
     var what = describeTag(target.block.localName || 'block');
@@ -3755,7 +3754,7 @@
           typeof res.data.note === 'string' ? res.data.note : '', target.block, regions, aligned.runs);
         setAIOpen(false);
         openReview();
-        flash('Suggestion ready \u2014 accept or dismiss it');
+        flash('Suggestion ready: accept or dismiss it');
         return s;
       });
     });
@@ -3864,8 +3863,8 @@
             openReview();
           }
         }
-        flash(out.suggestion ? 'AI drafted a reply and suggested a change — review it before saving'
-          : out.reply ? 'AI drafted a reply — edit it or delete it before saving'
+        flash(out.suggestion ? 'AI drafted a reply and suggested a change: review it before saving'
+          : out.reply ? 'AI drafted a reply: edit it or delete it before saving'
           : 'AI had nothing to add');
         return out;
       });
@@ -3875,11 +3874,11 @@
   function acceptSuggestion(s) {
     if (state.suggestions.indexOf(s) === -1) return false;
     if (!aiCanWrite()) {
-      flash('AI is set to read only \u2014 copy the suggestion and make the change yourself');
+      flash('AI is set to read only: copy the suggestion and make the change yourself');
       return false;
     }
     if (isStale(s)) {
-      flash('That paragraph has changed since — dismiss this and ask again');
+      flash('That paragraph has changed since: dismiss this and ask again');
       renderReview();
       return false;
     }
@@ -3915,8 +3914,8 @@
     state.suggestions.slice().forEach(function (s) {
       if (!isStale(s) && acceptSuggestion(s)) n++;
     });
-    flash(n ? 'Applied ' + n + ' suggestion' + (n === 1 ? '' : 's') + ' — Ctrl/Cmd+Z undoes them one at a time'
-            : 'Nothing could be applied — the paragraphs have changed since');
+    flash(n ? 'Applied ' + n + ' suggestion' + (n === 1 ? '' : 's') + ': Ctrl/Cmd+Z undoes them one at a time'
+            : 'Nothing could be applied: the paragraphs have changed since');
     return n;
   }
 
@@ -3952,7 +3951,7 @@
     }
     var close = doc().createElement('button');
     close.className = 'x';
-    close.title = 'Close — suggestions keep until you accept or dismiss them';
+    close.title = 'Close: suggestions keep until you accept or dismiss them';
     close.textContent = '×';
     close.addEventListener('click', closeReview);
     tools.appendChild(close);
@@ -4022,7 +4021,7 @@
         accept.textContent = 'Accept';
         accept.disabled = stale;
         accept.addEventListener('click', function () {
-          if (acceptSuggestion(s)) flash('Applied — Ctrl/Cmd+Z undoes it');
+          if (acceptSuggestion(s)) flash('Applied: Ctrl/Cmd+Z undoes it');
         });
       } else {
         accept.className = 'pill';
@@ -4090,7 +4089,7 @@
     var clip = window.navigator && navigator.clipboard;
     if (!clip || !clip.writeText) { flash('This browser will not let VibeRevise copy'); return; }
     clip.writeText(text).then(function () { flash(done); },
-      function () { flash('The browser refused to copy \u2014 select the text and copy it instead'); });
+      function () { flash('The browser refused to copy: select the text and copy it instead'); });
   }
 
   // The words selected inside `block`, if any.
@@ -4144,7 +4143,7 @@
     if (!region) return null;
     state.explanation = null;
     renderReview();
-    flash('Saved as a comment \u2014 edit it or delete it before saving the file');
+    flash('Saved as a comment: edit it or delete it before saving the file');
     return region;
   }
 
@@ -4174,7 +4173,7 @@
 
   /*
    * Walked in DOCUMENT order rather than region order, because several added
-   * blocks can share one anchor offset — a block added after a block that was
+   * blocks can share one anchor offset: a block added after a block that was
    * itself added has nowhere else to go. applyEdits sorts by offset with a
    * stable sort, so feeding them in document order is what keeps them in the
    * order they appear on screen.
@@ -4259,7 +4258,7 @@
   /*
    * Comments are ranges too: a new one is a zero-length splice before its
    * section, an edited one replaces the comment that is already there, and a
-   * deleted one cuts it — taking the whole line with it if the comment had the
+   * deleted one cuts it, taking the whole line with it if the comment had the
    * line to itself.
    *
    * A comment left empty is treated as no comment: a new one is never written,
@@ -4347,13 +4346,13 @@
 
   /*
    * Hand the file to the downloads API, which is the only way to get the OS
-   * Save dialog — and therefore the only way the user can choose to replace the
+   * Save dialog, and therefore the only way the user can choose to replace the
    * original. Two fallbacks, because a service worker cannot create object URLs
    * of its own and support for reaching a page's blob: URL has moved around
    * between Chrome versions:
    *   1. a blob: URL created here
    *   2. a data: URL, which needs no cross-context resolution
-   *   3. an ordinary download link in the page — no dialog, so the file lands in
+   *   3. an ordinary download link in the page: no dialog, so the file lands in
    *      the Downloads folder and the status bar says so
    */
   function requestDownload(text) {
@@ -4389,7 +4388,7 @@
    * Write the document back to the server it came from.
    *
    * Only ever reached for an http(s) document whose server answered OPTIONS
-   * with PUT in its Allow header, so this is not a probe — it is the save.
+   * with PUT in its Allow header, so this is not a probe: it is the save.
    *
    * The write is CONDITIONAL. If the server gave us an ETag or a Last-Modified
    * when we read the document, it comes back as If-Match / If-Unmodified-Since,
@@ -4454,7 +4453,7 @@
   }
 
   /*
-   * Saving through the host — the web app's file handle, or the extension's.
+   * Saving through the host: the web app's file handle, or the extension's.
    *
    * A host that turns out not to be able to write says so with fallback:true,
    * and the download catches the edits. Cancelling a dialog is deliberately
@@ -4466,7 +4465,7 @@
       if (!res || res.ok || !res.fallback) return res;
       return requestDownload(text).then(function (dl) {
         if (!dl || !dl.ok) return dl;
-        return { ok: true, where: 'Could not write to the file — downloaded ' + state.filename + ' instead' };
+        return { ok: true, where: 'Could not write to the file: downloaded ' + state.filename + ' instead' };
       });
     });
   }
@@ -4526,7 +4525,7 @@
     var attempt = state.saveFile ? hostSave(text, opts) : toServer
       ? saveToServer(text).then(function (res) {
           if (res.ok || res.conflict) return res;
-          // The server said no. Do not lose the edits over it — fall back to
+          // The server said no. Do not lose the edits over it: fall back to
           // the download. A missing route is an ordinary fact about the server,
           // not a failure worth alarming anyone about; anything else is worth
           // repeating back.
@@ -4543,7 +4542,7 @@
     return attempt.then(function (res) {
       if (!res || !res.ok) {
         flash(res && res.conflict
-          ? 'Not saved — ' + res.message
+          ? 'Not saved: ' + res.message
           : 'Save failed: ' + ((res && res.message) || 'unknown error'));
         return;
       }
@@ -4568,13 +4567,13 @@
       } else if (res.toServer) {
         where = 'Saved ' + state.filename + ' to the server';
       } else if (res.noRoute) {
-        where = 'This server does not accept saves — downloaded ' + state.filename + ' instead';
+        where = 'This server does not accept saves: downloaded ' + state.filename + ' instead';
       } else if (res.fellBack) {
-        where = 'Server refused the save (' + res.fellBack + ') — downloaded instead';
+        where = 'Server refused the save (' + res.fellBack + '): downloaded instead';
       } else if (res.viaAnchor) {
         where = 'Saved to your Downloads folder as ' + state.filename;
       } else {
-        where = 'Saved ' + state.filename + ' — the original file is unchanged';
+        where = 'Saved ' + state.filename + ': the original file is unchanged';
       }
       flash(skipped
         ? where + ' (' + skipped + ' empty left out)'
@@ -4621,7 +4620,7 @@
       if (state.sessionWarned) return;
       state.sessionWarned = true;
       console.warn('[VibeRevise] could not keep the session:', err);
-      flash('This document is too big to keep through a reload — save before reloading');
+      flash('This document is too big to keep through a reload: save before reloading');
     });
   }
 
@@ -4957,7 +4956,7 @@
     if (at === -1) return false;
     if (keepMine) {
       var r = x.region;
-      if (!r || !r.island.isConnected) { flash('There is nowhere left to put that — copy it instead'); return false; }
+      if (!r || !r.island.isConnected) { flash('There is nowhere left to put that: copy it instead'); return false; }
       var before = r.current;
       Islands.writeValue(r.island, x.mine);
       state.lastTouch = 0;
@@ -5031,7 +5030,7 @@
     renderOutsideMarks();
     refresh();
     renderChanges();
-    flash(on ? 'Showing what changed outside VibeRevise, in blue' : 'Highlights hidden — the changes are still listed');
+    flash(on ? 'Showing what changed outside VibeRevise, in blue' : 'Highlights hidden: the changes are still listed');
   }
 
   /*

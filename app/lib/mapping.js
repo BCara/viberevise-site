@@ -1,11 +1,11 @@
 /*
- * VibeRevise — offset map.
+ * VibeRevise: offset map.
  *
  * Pairs each live DOM text node with the exact span of the original source file
  * it came from. This is the foundation the whole extension rests on: if a node
  * is mapped, we can rewrite its text by splicing [start,end) in the source and
  * leave every other byte of the file alone. If a node cannot be mapped with
- * certainty, it is simply not editable. There is no third option — we never
+ * certainty, it is simply not editable. There is no third option: we never
  * guess at an offset.
  *
  * HOW THE PAIRING WORKS
@@ -29,7 +29,7 @@
  *
  * One case is not a failure but genuinely has no answer: the parser sometimes
  * MERGES text from several places in the file into one text node. The common
- * example is at the end of every document —
+ * example is at the end of every document:
  *
  *     ...</footer>\n</body>\n</html>\n
  *
@@ -42,7 +42,7 @@
  * spans marked consumed so the rest of the document stays in step. Foster
  * parenting out of a <table> can do the same thing to non-whitespace text.
  *
- * Every pair — fast path or slow — is then verified: the source span, once
+ * Every pair, fast path or slow, is then verified: the source span, once
  * newline-normalised and entity-decoded the way the parser would, must equal
  * the node's text exactly, and span indices must strictly increase across the
  * document. A pair that fails verification is discarded, not repaired.
@@ -131,8 +131,8 @@
    * Pair DOM comment nodes with the comments in the source.
    *
    * Only real <!-- --> comments are paired. The constructs the parser turns
-   * into comment nodes without their being written as comments — <![if !IE]>,
-   * <?php ?>, </3> — are recorded by the tokenizer purely so the sequence lines
+   * into comment nodes without their being written as comments, <![if !IE]>,
+   * <?php ?>, </3>are recorded by the tokenizer purely so the sequence lines
    * up, and are deliberately left unpaired: rewriting one would be rewriting
    * something whose meaning we do not understand.
    *
@@ -321,11 +321,11 @@
    *
    *   - Nested elements of the same name need no depth counting, because the
    *     inner one consumes its own tags inside the outer one's recursion.
-   *   - Implied elements — <html>, <head>, <body>, the <tbody> the parser
-   *     inserts into every table — have no start tag in the source. The next
+   *   - Implied elements, <html>, <head>, <body>, the <tbody> the parser
+   *     inserts into every table, have no start tag in the source. The next
    *     token will not match their name, so nothing is consumed and they are
    *     left unmapped.
-   *   - Unclosed elements — <p>one<p>two — have no end tag, so the token after
+   *   - Unclosed elements: <p>one<p>two: have no end tag, so the token after
    *     their children does not match either, and endTag stays null.
    *
    * Every pairing is then verified against the text map: an element's tags must
@@ -335,7 +335,7 @@
    *
    * `spanOf` deliberately holds only the spans of EDITABLE text. Runs of
    * whitespace are all identical to each other, so when the parser discards
-   * some of them — the whitespace before a doctype, say — the aligner has no
+   * some of them, the whitespace before a doctype, say, the aligner has no
    * way to tell which "\n" in the source a given "\n" in the DOM came from, and
    * may pair it with an equally plausible earlier one. That never matters for
    * editing, because whitespace is never spliced, but it would make an element
@@ -467,7 +467,7 @@
     }
 
     // Element boundaries, for inserting new blocks. Built from the text map, so
-    // it inherits its verification — see mapElements for why only editable
+    // it inherits its verification: see mapElements for why only editable
     // spans are trusted here.
     var spanOf = new WeakMap();
     for (var j = 0; j < records.length; j++) {

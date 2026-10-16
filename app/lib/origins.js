@@ -1,5 +1,5 @@
 /*
- * VibeRevise — what will we touch?
+ * VibeRevise: what will we touch?
  *
  * One place decides which documents VibeRevise is willing to edit, because the
  * answer is a security boundary and a correctness boundary at the same time,
@@ -29,8 +29,8 @@
  *
  * WHAT CAN GO WRONG ON A PUBLIC PAGE, AND WHY IT IS SAFE
  * -----------------------------------------------------
- * The thing VibeRevise relies on — the bytes it re-fetched being the bytes the
- * browser parsed — is routinely false on the open web. A page built in the
+ * The thing VibeRevise relies on, the bytes it re-fetched being the bytes the
+ * browser parsed, is routinely false on the open web. A page built in the
  * browser serves a near-empty shell, so the source has none of the text that
  * is on screen. A page rendered per request returns something different the
  * second time.
@@ -57,7 +57,7 @@
 
   /*
    * Loopback, RFC1918 private space, link-local, IPv6 unique-local, mDNS .local
-   * names — and the 100.64.0.0/10 shared-address range, which is where
+   * names, and the 100.64.0.0/10 shared-address range, which is where
    * Tailscale and other WireGuard meshes put their nodes. A machine reachable
    * over a private mesh is the same kind of machine as one on the LAN.
    */
@@ -120,8 +120,8 @@
    *
    * A path ending in .html is already a name, and keeping it means a document
    * saved from a NAS lands under the name it has there. Anything else is a
-   * hosted page with no name of its own — example.com/ , or
-   * example.com/docs/getting-started — so one is built from the host and the
+   * hosted page with no name of its own, example.com/ , or
+   * example.com/docs/getting-started, so one is built from the host and the
    * path, because "page.html" in a Downloads folder tells nobody anything.
    *
    * Everything outside [A-Za-z0-9._-] becomes a hyphen. That is stricter than
@@ -160,13 +160,13 @@
   /*
    * Does an OPTIONS response say this resource implements PUT?
    *
-   * `headers` is anything with a .get(name) — a fetch Response's Headers, or a
+   * `headers` is anything with a .get(name): a fetch Response's Headers, or a
    * plain stand-in in a test.
    *
    * ONLY the Allow header counts. Access-Control-Allow-Methods is deliberately
    * ignored, and the distinction is the whole reason this function exists:
    *
-   *   Allow                        RFC 9110 10.2.1 — the methods this resource
+   *   Allow                        RFC 9110 10.2.1, the methods this resource
    *                                actually implements. A capability.
    *   Access-Control-Allow-Methods  which methods a CROSS-ORIGIN caller is
    *                                permitted to attempt. A policy, and one that

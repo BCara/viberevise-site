@@ -1,10 +1,10 @@
 /*
- * VibeRevise — the web app.
+ * VibeRevise: the web app.
  *
  * The extension edits the page it was injected into. This edits a file you
  * choose, rendered into an iframe, and the editor is told to work on that
- * document instead of this one. Everything below the editor — the tokenizer,
- * the offset map, the islands, the structures — is the same code, unchanged.
+ * document instead of this one. Everything below the editor, the tokenizer,
+ * the offset map, the islands, the structures, is the same code, unchanged.
  *
  * WHY AN IFRAME
  * -------------
@@ -15,8 +15,8 @@
  * leaking into the app's chrome or the other way round.
  *
  * It is sandboxed with allow-same-origin and NOT allow-scripts. That pairing is
- * the point: no script inside the user's document can run — it could otherwise
- * reach `parent` and take over the app, since the frame shares this origin —
+ * the point: no script inside the user's document can run: it could otherwise
+ * reach `parent` and take over the app, since the frame shares this origin,
  * while this page keeps full DOM access to edit it. (allow-same-origin together
  * WITH allow-scripts is the combination that is unsafe; this is the other one.)
  *
@@ -24,11 +24,11 @@
  * ------
  * Three routes, best first, decided by what the browser actually offers:
  *
- *   1. A file handle — Chrome, Edge and Opera on the desktop. The file the user
+ *   1. A file handle: Chrome, Edge and Opera on the desktop. The file the user
  *      opened is rewritten in place. No copy, no Downloads folder, no dialog
  *      after the first one. This is the thing the extension cannot do at all:
  *      Chrome will not let an extension write to a file:// path.
- *   2. The share sheet — Android. Hands the edited file to whichever app it
+ *   2. The share sheet: Android. Hands the edited file to whichever app it
  *      came from. Offered only when navigator.canShare() agrees, because iOS
  *      Safari has been known to accept the call and share the text instead.
  *   3. A download. Always available, always last.
@@ -207,7 +207,7 @@ function toast(message, tone) {
 /*
  * Say up front how saving will work here, because it differs by browser and
  * finding out at save time is the wrong moment. Firefox and Safari do not
- * implement the file pickers — Mozilla considers them harmful — so those users
+ * implement the file pickers, Mozilla considers them harmful, so those users
  * get a download and should know before they start.
  */
 function describeSaving() {
@@ -358,7 +358,7 @@ async function load(source, name, handle, url) {
   watchUnsaved();
 
   toast(map.stats.editable + ' editable text region' +
-        (map.stats.editable === 1 ? '' : 's') + ' — click any of them and type.');
+        (map.stats.editable === 1 ? '' : 's') + ': click any of them and type.');
 }
 
 // --- saving ------------------------------------------------------------------
@@ -388,7 +388,7 @@ function downloadFile(text) {
   document.body.appendChild(a);
   a.click();
   setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 60000);
-  return { ok: true, where: 'Downloaded ' + current.name + ' — put it back over the original' };
+  return { ok: true, where: 'Downloaded ' + current.name + ': put it back over the original' };
 }
 
 /*
@@ -419,7 +419,7 @@ function saveFile(text, opts) {
   if (current.handle) {
     return writeThroughHandle(text).catch(function (err) {
       // Permission can lapse, or the file can have gone. Never lose the edits
-      // over it — fall back rather than fail.
+      // over it: fall back rather than fail.
       console.warn('[VibeRevise] writing through the handle failed:', err);
       return downloadFile(text);
     });
@@ -440,7 +440,7 @@ function saveFile(text, opts) {
 /*
  * Anything on the user's own network: a NAS, a documents server, a static site
  * being previewed. Public origins are refused, and the refusal is worth stating
- * plainly because it looks arbitrary otherwise — the byte-preservation
+ * plainly because it looks arbitrary otherwise: the byte-preservation
  * guarantee rests on re-reading exactly the bytes the browser parsed, which
  * holds for a file server and does not hold for a page rendered per request.
  *
@@ -559,7 +559,7 @@ function openNetwork(url) {
       return load(text, name, null, from);
     })
     .catch(function (err) {
-      netMessage('Could not open it — ' + err.message, 'warn');
+      netMessage('Could not open it: ' + err.message, 'warn');
     });
 }
 
@@ -593,7 +593,7 @@ function watchUnsaved() {
  * Convenient for a bookmark, and the seed of something larger: a link that
  * opens somebody else's document ready to be marked up is the whole shape of
  * sending a document out for review. The URL has to be same-origin or
- * CORS-permitted, and the file is fetched, not uploaded — nothing leaves the
+ * CORS-permitted, and the file is fetched, not uploaded: nothing leaves the
  * browser either way.
  *
  * There is no file handle behind a fetched document, so Save will share or
@@ -601,13 +601,13 @@ function watchUnsaved() {
  * than discovered at save time.
  */
 /*
- * A browser refuses fetch() from an https page to an http URL — mixed content,
+ * A browser refuses fetch() from an https page to an http URL: mixed content,
  * decided before CORS is even looked at. The app has to be on https to be
  * installable, and documents on a home network are usually on plain http, so
  * that combination is the normal case rather than an edge one.
  *
  * Where the host offers /fetch, the request goes through it and arrives on this
- * origin instead. Where it does not — a static host with no backend — there is
+ * origin instead. Where it does not, a static host with no backend, there is
  * nothing to be done in the page, and saying so beats a blocked request and a
  * console error nobody sees.
  */
@@ -632,8 +632,8 @@ function hasProxy() {
  * otherwise bite in opposite situations:
  *
  *   - the page is on https and the document on http, which no browser will mix
- *   - the page is reached from outside the network the document lives on — over
- *     a mesh, say — so this device cannot route to 192.168.x at all, while the
+ *   - the page is reached from outside the network the document lives on, over
+ *     a mesh, say, so this device cannot route to 192.168.x at all, while the
  *     machine serving the app is sitting on that network and can
  *
  * Without a proxy, which is any static host, the page fetches directly and that
@@ -672,7 +672,7 @@ function openFromQuery() {
       return load(text, name, null, from);
     })
     .catch(function (err) {
-      toast('Could not open ' + src + ' — ' + err.message, 'warn');
+      toast('Could not open ' + src + ': ' + err.message, 'warn');
     });
 }
 
@@ -725,7 +725,7 @@ els.save.addEventListener('click', function () { window.VibeReviseEditor.save();
  * lets it work with no network.
  *
  * It needs a secure context: https, or localhost. Served over plain http on a
- * LAN address it simply will not register, and the app still works — it just
+ * LAN address it simply will not register, and the app still works: it just
  * cannot be installed from there. Nothing here treats that as an error.
  */
 function registerWorker() {
@@ -742,7 +742,7 @@ function registerWorker() {
 
 /*
  * A file opened from the operating system, once the app is installed and
- * registered as an HTML handler — double-clicking a document, or Open With.
+ * registered as an HTML handler: double-clicking a document, or Open With.
  * The handle comes with it, so Save writes straight back to that file.
  */
 function acceptLaunchedFile() {
@@ -784,7 +784,7 @@ var aiLastProvider = 'anthropic';
 
 /*
  * Switching provider fills in its address and default model, but only over
- * the previous provider's defaults — never over something the user typed.
+ * the previous provider's defaults: never over something the user typed.
  */
 function applyAIPreset(next) {
   var was = AI.PROVIDERS[aiLastProvider];
@@ -853,7 +853,7 @@ function settingsStatus(text, tone) {
       settingsStatus('Asking ' + AI.describe(cfg) + ' for a one-word answer\u2026');
       AI.complete(cfg, AI.pingRequest(), function (url, init) { return fetch(url, init); })
         .then(function (res) {
-          if (res.ok) settingsStatus('It works \u2014 ' + AI.describe(cfg) + ' answered. Press Save to keep it.', 'good');
+          if (res.ok) settingsStatus('It works: ' + AI.describe(cfg) + ' answered. Press Save to keep it.', 'good');
           else settingsStatus(res.message, 'bad');
         });
     });

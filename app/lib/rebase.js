@@ -1,5 +1,5 @@
 /*
- * VibeRevise — the file changed underneath us.
+ * VibeRevise: the file changed underneath us.
  *
  * Someone (often another AI tool) rewrites the file on disk while VibeRevise
  * has unsaved edits against the version it opened. After a reload the page is

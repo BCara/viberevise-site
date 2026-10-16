@@ -1,11 +1,11 @@
 /*
- * VibeRevise — service worker.
+ * VibeRevise: service worker.
  *
  * Two jobs, and neither is caching anyone's document.
  *
  *   1. Make the app installable. A browser will only offer "install" or a
  *      real Add to Home Screen for a page with a manifest and a worker.
- *   2. Make it work offline. That is not a nicety here — the whole premise is
+ *   2. Make it work offline. That is not a nicety here: the whole premise is
  *      that your file never leaves the browser, so needing a network to edit
  *      it would be a strange contradiction. Once loaded, VibeRevise works on a
  *      plane.

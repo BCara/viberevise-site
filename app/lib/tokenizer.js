@@ -1,5 +1,5 @@
 /*
- * VibeRevise — source tokenizer.
+ * VibeRevise: source tokenizer.
  *
  * PURPOSE
  * -------
@@ -17,21 +17,21 @@
  * COMMENTS
  * --------
  * scan() records comments too, as {start, end, data, bogus}. VibeRevise stores
- * a user's notes as ordinary HTML comments — invisible in a browser, plainly
+ * a user's notes as ordinary HTML comments, invisible in a browser, plainly
  * readable in a text editor, and carried along whenever the file is sent
- * anywhere — so it needs to find the ones already in a file as well as write
+ * anywhere, so it needs to find the ones already in a file as well as write
  * new ones.
  *
  * `bogus` marks the constructs that are not written as comments but which the
  * parser turns into comment nodes anyway: <![if !IE]>, <?php ... ?>, </3>. They
  * are recorded so the sequence still lines up with the DOM, and skipped for
- * every other purpose. The doctype is NOT one of these — it becomes a
- * DocumentType node, not a comment — so it is not recorded at all.
+ * every other purpose. The doctype is NOT one of these, it becomes a
+ * DocumentType node, not a comment, so it is not recorded at all.
  *
  * TAGS
  * ----
  * scan() also records every start and end tag it walks past, as {start, end,
- * name, isEnd}. Nothing is inferred from them here — no tree, no nesting, no
+ * name, isEnd}. Nothing is inferred from them here: no tree, no nesting, no
  * implied elements. They are raw positions, which mapping.js pairs with the
  * real elements the browser built, the same way text spans are paired with text
  * nodes. Knowing where an element's tags sit in the file is what makes it
@@ -64,7 +64,7 @@
  *  - A "<" that is not followed by a letter, "!", "?" or "/" is literal text
  *    ("a < b"), exactly as the parser treats it.
  *
- * KNOWN DIVERGENCES (both safe — they cost editability, never bytes)
+ * KNOWN DIVERGENCES (both safe: they cost editability, never bytes)
  * ------------------------------------------------------------------
  *  - <noscript> is treated as raw text, which is correct in a browser with
  *    scripting enabled (our only target). With scripting disabled its contents
@@ -288,8 +288,8 @@
           continue;
         }
 
-        // Note: a "/>" on a raw-text element does NOT self-close it in HTML —
-        // <script/> opens a script element — so the flag is intentionally ignored.
+        // Note: a "/>" on a raw-text element does NOT self-close it in HTML,
+        // <script/> opens a script element, so the flag is intentionally ignored.
         if (has(RAWTEXT, name) || has(RCDATA, name)) {
           if (has(NEWLINE_EATERS, name)) eatNewline = true;
           var stop = findRawTextEnd(source, i, name);
@@ -309,7 +309,7 @@
     return { spans: spans, tags: tags, comments: comments };
   }
 
-  // The text spans on their own — by far the most common thing to want.
+  // The text spans on their own: by far the most common thing to want.
   function tokenize(source) { return scan(source).spans; }
 
   root.VibeReviseTokenizer = { scan: scan, tokenize: tokenize, readTag: readTag };

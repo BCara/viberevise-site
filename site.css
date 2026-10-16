@@ -3,7 +3,7 @@
  *
  * Colours and fonts are not set here: build-site.js writes each brand's into
  * the :root block at the top of the page, under these same token names. No
- * web fonts and no third-party requests — the product's pitch is that nothing
+ * web fonts and no third-party requests: the product's pitch is that nothing
  * leaves your browser, and the site that sells it should keep to that too.
  */
 * { box-sizing: border-box; }

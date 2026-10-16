@@ -1,5 +1,5 @@
 /*
- * VibeRevise — adding a block.
+ * VibeRevise: adding a block.
  *
  * Everything here is about answering one question: if the user asks for "another
  * one of these", what exactly gets written into the file, and at which offset?
@@ -7,7 +7,7 @@
  * An insertion is a ZERO-LENGTH splice. Nothing existing is replaced, so the
  * promise holds unchanged: every byte that was there before is still there,
  * with a new run of text sitting between two of them. Because nothing is
- * written until save, an insertion also cannot invalidate any other offset —
+ * written until save, an insertion also cannot invalidate any other offset:
  * every edit is still measured against the original source.
  *
  * The anchor is derived from the element map (mapping.js), which knows where
@@ -62,7 +62,7 @@
 
   /*
    * Where a new sibling for `block` should be spliced in, as
-   * { offset, before, after } — the inserted text is before + markup + after.
+   * { offset, before, after }: the inserted text is before + markup + after.
    *
    * Two cases:
    *   - the block has a closing tag: go straight after it, with a newline and
@@ -102,8 +102,8 @@
    * What the new element should be: the same tag, and the same class so it
    * picks up the same styling.
    *
-   * Nothing else is copied. `id` in particular must not be — duplicating one
-   * would put two elements with the same id in the document — and copying
+   * Nothing else is copied. `id` in particular must not be, duplicating one
+   * would put two elements with the same id in the document, and copying
    * arbitrary attributes risks carrying over something that referred to this
    * element specifically.
    */

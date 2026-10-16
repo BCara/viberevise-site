@@ -1,8 +1,8 @@
 /*
- * VibeRevise — app chrome.
+ * VibeRevise: app chrome.
  *
  * Deliberately quiet. The document being edited supplies its own typography and
- * colour, and anything assertive here would compete with it — the user is
+ * colour, and anything assertive here would compete with it: the user is
  * looking at their file, not at this. Mobile-first: the layout below is the
  * phone layout, and the desktop one is the same thing with more room.
  */
@@ -36,7 +36,7 @@
  * The hidden attribute has to win.
  *
  * [hidden] { display: none } is a UA rule, so any class here that sets display
- * — .welcome is flex, .chrome is flex — silently beats it and the element stays
+ * .welcome is flex, .chrome is flex, silently beats it and the element stays
  * on screen. That is what happened: the welcome panel never went away when a
  * file opened, so it and the document shared the flex row and pushed the page
  * off the side of a phone.
@@ -116,7 +116,7 @@ body {
   /* A flex item will not shrink below its content by default, and a document
      is as wide as it likes. Without this the stage refuses to be narrower than
      the widest thing in the file and pushes the whole app off the side of the
-     screen — taking Save with it. */
+     screen: taking Save with it. */
   min-width: 0;
   position: relative;
   display: flex;

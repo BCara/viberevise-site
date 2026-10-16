@@ -34,7 +34,7 @@
     <h1>Fix the words. Keep the file.</h1>
     <p class="lede">
       Open an HTML document, click any text and type. What you save is the file
-      you opened, with only the words you changed replaced — the markup,
+      you opened, with only the words you changed replaced: the markup,
       indentation, comments and entities all exactly as they were.
     </p>
 
@@ -56,8 +56,8 @@
           <span class="net-msg" id="net-msg"></span>
         </div>
         <p class="hint">
-          A NAS, a documents server, anything on your own network — a
-          <code>192.168.</code>, <code>10.</code> or <code>172.16–31.</code>
+          A NAS, a documents server, anything on your own network: a
+          <code>192.168.</code>, <code>10.</code> or <code>172.16.</code> to <code>172.31.</code>
           address, <code>localhost</code>, a <code>.local</code> name, or a
           private mesh. Public websites are refused: the guarantee this tool
           makes depends on re-reading the same bytes the browser parsed, which
@@ -75,7 +75,7 @@
       <div>
         <dt>Nothing is uploaded</dt>
         <dd>Your document is opened and edited in this browser tab. It is not
-            sent anywhere — unless you turn on AI with your own key, and then
+            sent anywhere, unless you turn on AI with your own key, and then
             only the paragraphs you ask about, to the service you chose.</dd>
       </div>
       <div>
@@ -85,7 +85,7 @@
       <div>
         <dt>What you can change</dt>
         <dd>Words, and adding another paragraph, list or table like one already
-            there. Not layout, styling or images — that restraint is what keeps
+            there. Not layout, styling or images: that restraint is what keeps
             the file intact.</dd>
       </div>
     </dl>
@@ -104,10 +104,10 @@
     <label for="set-author">Your name</label>
     <input id="set-author" maxlength="60" autocomplete="name"
            placeholder="So people can see who wrote what">
-    <p class="hint">Signs your comments and the list of changes. Not a sign-in —
+    <p class="hint">Signs your comments and the list of changes. Not a sign-in:
        anyone can type any name.</p>
 
-    <h3 class="set-section" id="ai-section">AI suggestions <span class="opt">— optional</span></h3>
+    <h3 class="set-section" id="ai-section">AI suggestions <span class="opt">optional</span></h3>
     <p class="hint">Rewrites, proofreading and replies to comments, using your own
        key. Off until you add one. Only the words of the paragraphs involved are
        sent, only when you ask, straight from this browser to the address below;
@@ -131,14 +131,14 @@
     <fieldset class="ai-access">
       <legend>What AI may do</legend>
       <label class="choice"><input type="radio" name="ai-access" id="set-ai-read" value="read" checked>
-        <span><b>Read</b> — explains, reviews, replies to comments and suggests
+        <span><b>Read</b>: explains, reviews, replies to comments and suggests
         edits. You make every change yourself.</span></label>
       <label class="choice"><input type="radio" name="ai-access" id="set-ai-write" value="write">
-        <span><b>Read and write</b> — its suggested edits also get an
+        <span><b>Read and write</b>: its suggested edits also get an
         <b>Accept</b> button. Nothing changes until you press it.</span></label>
     </fieldset>
 
-    <p class="hint">Kept in this browser’s storage for this app only — not synced,
+    <p class="hint">Kept in this browser’s storage for this app only, not synced,
        never sent anywhere but the address above. The service must accept
        requests from a web page; Anthropic, OpenAI, OpenRouter and Gemini do, and
        a local server may need to be told to (for Ollama, <code>OLLAMA_ORIGINS</code>).</p>

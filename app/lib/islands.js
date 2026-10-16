@@ -1,5 +1,5 @@
 /*
- * VibeRevise — editable islands.
+ * VibeRevise: editable islands.
  *
  * Each editable text node is wrapped in its own <span contenteditable>, so a
  * region of text is exactly one source span and one editing surface. The
@@ -105,7 +105,7 @@
   function plain(value) { return String(value || '').replace(MARKS_RE, ''); }
 
   // True when the island contains nothing but text, <br> and VibeRevise's own
-  // formatting — i.e. nothing the browser or a paste sneaked in behind our back.
+  // formatting: i.e. nothing the browser or a paste sneaked in behind our back.
   function isClean(el) {
     for (var n = el.firstChild; n; n = n.nextSibling) {
       if (n.nodeType === 3) continue;
@@ -129,7 +129,7 @@
   }
 
   /*
-   * Where a DOM position — a (container, offset) pair, as a Range gives — falls
+   * Where a DOM position, a (container, offset) pair, as a Range gives, falls
    * in the island's flattened value. Formatting counts one for each of its
    * marks, so a position just inside a bold run is one past one just before it.
    * Returns null for a point outside the island.

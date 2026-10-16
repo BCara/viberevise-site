@@ -1,5 +1,5 @@
 /*
- * VibeRevise — comments.
+ * VibeRevise: comments.
  *
  * A comment is stored as an ordinary HTML comment sitting just before the block
  * it is attached to:
@@ -8,7 +8,7 @@
  *     <p>Revenue grew by 12% over the quarter.</p>
  *
  * Nothing about that is VibeRevise's private format. A browser shows none of
- * it, a text editor shows all of it, and anyone — or anything — you send the
+ * it, a text editor shows all of it, and anyone, or anything, you send the
  * file to can read it without knowing this extension exists. That is the whole
  * reason for choosing comments over a store inside the browser: notes that
  * cannot travel with the document are not much use.
@@ -23,15 +23,15 @@
  *
  *     <!-- comment [Cara · 2026-10-01]: needs a figure for Q3 -->
  *
- * The name is whatever the writer typed into VibeRevise — self-declared, not
- * verified — so it says who claims to have written a note, which is what a
+ * The name is whatever the writer typed into VibeRevise, self-declared, not
+ * verified, so it says who claims to have written a note, which is what a
  * team that trusts each other needs, and no more. The plain form without
  * brackets is still read, so notes from before authorship existed keep working.
  *
  * SHOWING THEM
  * ------------
- * A comment that no browser displays is the right default — the document looks
- * exactly as it did before anyone annotated it — but it is the wrong default
+ * A comment that no browser displays is the right default, the document looks
+ * exactly as it did before anyone annotated it, but it is the wrong default
  * for someone who wants to read their own notes without this extension. So a
  * comment has a second form, carrying the same three fields:
  *

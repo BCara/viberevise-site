@@ -1,5 +1,5 @@
 /*
- * VibeRevise — in-page prompt.
+ * VibeRevise: in-page prompt.
  *
  * A small card in the corner of the document, used when VibeRevise needs
  * something from the user before it can do anything: at the moment, that means
@@ -55,7 +55,7 @@
     // The label WRAPS rather than clipping. Clipping it was a mistake twice
     // over: a squeezed button turned "Choose DIGISTAYBOOK_…" into "Choo", and
     // then "Choose this file" into "Ch". Two letters and an ellipsis is not a
-    // label, and the failure is silent — nothing says the button is lying
+    // label, and the failure is silent: nothing says the button is lying
     // about what it does. A wrapped label is uglier on a narrow card and
     // always readable, which is the right way round.
     '.row { flex-wrap: wrap; }',
@@ -116,7 +116,7 @@
   }
 
   // showOpenFilePicker is the better of the two ways to ask, because what it
-  // hands back is a handle rather than a snapshot — see chooseFile(). It needs
+  // hands back is a handle rather than a snapshot: see chooseFile(). It needs
   // a secure context, which a file:// page is, and it does not exist in
   // Firefox or Safari, where the input is the only way.
   var CAN_HANDLE = typeof window.showOpenFilePicker === 'function';
@@ -131,7 +131,7 @@
    * the last one did.
    *
    * The browser remembers a directory per id, across sessions, and without one
-   * every picker opens in Downloads — which is almost never where the document
+   * every picker opens in Downloads, which is almost never where the document
    * is. Sharing the id between opening and saving is deliberate: they are two
    * halves of working on one file, and a save that starts somewhere other than
    * where the file was opened is the thing that makes people save a second
@@ -242,8 +242,8 @@
   /*
    * Ask for somewhere to write, defaulting to the file being edited.
    *
-   * Picking the same file is the point — that is what "save over the top"
-   * means — so the name is pre-filled, the picker opens where the last one
+   * Picking the same file is the point: that is what "save over the top"
+   * means, so the name is pre-filled, the picker opens where the last one
    * did, and `near` starts it in that file's own directory when we have a
    * handle for it. The user should only have to confirm.
    *

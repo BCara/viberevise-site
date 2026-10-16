@@ -1,12 +1,12 @@
 /*
- * VibeRevise — AI, with the user's own key.
+ * VibeRevise: AI, with the user's own key.
  *
  * Off until someone adds a key. Nothing in this file runs a request on its
  * own: the editor asks for a suggestion when the user presses a button, the
  * host (the extension's service worker, or the web app) sends it, and what
  * comes back is a SUGGESTION that changes nothing until it is accepted.
  *
- * Pure functions only — no DOM, no storage, no globals beyond the one export —
+ * Pure functions only, no DOM, no storage, no globals beyond the one export,
  * so the same file serves the service worker, the editor and the node tests.
  *
  * TWO WIRE FORMATS
@@ -19,8 +19,8 @@
  *
  * WHAT IS SENT
  * ------------
- * Only the words of the paragraphs involved — never the markup, never the
- * file — split at the inline formatting so the answer can be put back without
+ * Only the words of the paragraphs involved, never the markup, never the
+ * file, split at the inline formatting so the answer can be put back without
  * moving a single tag. That is the reason for RUNS below: a paragraph with a
  * bold phrase in it is three runs of text, and a rewrite must come back as
  * three runs, or it cannot be applied without rewriting markup, which is the
@@ -74,7 +74,7 @@
       keyHint: 'Create one in Google AI Studio.',
     },
     custom: {
-      label: 'Other — any OpenAI-compatible address',
+      label: 'Other: any OpenAI-compatible address',
       format: 'openai',
       baseUrl: '',
       model: '',
@@ -258,8 +258,8 @@
     if (status === 402) return where + ' says there is a billing problem with this key' + d + '.';
     if (status === 404) return where + ' does not know that model or address' + d + '. Check the model name in AI settings.';
     if (status === 413) return 'That was too much text for one request' + d + '.';
-    if (status === 429) return where + ' is rate-limiting this key — wait a moment and try again' + d + '.';
-    if (status === 529 || status === 503) return where + ' is overloaded — try again shortly' + d + '.';
+    if (status === 429) return where + ' is rate-limiting this key: wait a moment and try again' + d + '.';
+    if (status === 529 || status === 503) return where + ' is overloaded: try again shortly' + d + '.';
     if (status >= 500) return where + ' had a problem answering' + d + '. Try again.';
     return where + ' refused the request: HTTP ' + status + d;
   }
@@ -352,8 +352,8 @@
   }
 
   /*
-   * A request that never got an answer. In a browser that is usually CORS —
-   * the server did not say this page may call it — and the browser will not
+   * A request that never got an answer. In a browser that is usually CORS,
+   * the server did not say this page may call it, and the browser will not
    * say which, so the likely causes are named instead.
    */
   function networkMessage(cfg, err) {
@@ -363,7 +363,7 @@
     var why = String(err && err.message || err || '');
     if (local) {
       return 'Could not reach ' + host + '. Is the server running? A local server ' +
-             'must also allow requests from the browser — for Ollama, set ' +
+             'must also allow requests from the browser. For Ollama, set ' +
              'OLLAMA_ORIGINS=* before starting it.';
     }
     return 'Could not reach ' + host + (why ? ' (' + why + ')' : '') +

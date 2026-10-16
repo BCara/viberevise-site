@@ -1,5 +1,5 @@
 /*
- * VibeRevise — write-back.
+ * VibeRevise: write-back.
  *
  * The saved file is the ORIGINAL source string with a handful of character
  * ranges replaced. It is never produced by serialising the DOM. That is the
@@ -10,7 +10,7 @@
  * Two rules keep that promise:
  *   1. Only spans belonging to text nodes the user actually changed are in the
  *      edit list. An untouched file produces an empty edit list, and an empty
- *      edit list returns the source unchanged — byte for byte, by construction.
+ *      edit list returns the source unchanged: byte for byte, by construction.
  *   2. Edits are non-overlapping and applied against the ORIGINAL offsets.
  */
 (function (root) {

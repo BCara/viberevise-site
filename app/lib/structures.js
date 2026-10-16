@@ -1,9 +1,9 @@
 /*
- * VibeRevise — adding a structure.
+ * VibeRevise: adding a structure.
  *
  * blocks.js answers "another one of THESE", where the answer is one element
  * holding one run of text. This answers "a table", where the answer is a small
- * tree holding many runs — a header row, body rows, a cell the user can click
+ * tree holding many runs: a header row, body rows, a cell the user can click
  * into.
  *
  * CLONE FIRST
@@ -11,7 +11,7 @@
  * Every structure is built from a DONOR: an element of the same kind already in
  * the document. A table copies the donor's class and its column count; a list
  * copies the donor's class. That is not laziness, it is the only way the result
- * can be expected to look right — the document's stylesheet is not ours to
+ * can be expected to look right: the document's stylesheet is not ours to
  * touch, so an inserted element has to be the kind of element the stylesheet
  * already has an opinion about. A table cloned from a table beside it inherits
  * whatever that document does to tables.
@@ -25,7 +25,7 @@
  * NOTHING IS COPIED FROM THE DONOR'S CONTENT
  * ------------------------------------------
  * Only its tag, its class and its shape. Not its text, not its ids, not its
- * other attributes — an id would be duplicated and any other attribute might
+ * other attributes: an id would be duplicated and any other attribute might
  * refer to that element specifically.
  *
  * WHAT REACHES THE FILE
@@ -85,7 +85,7 @@
     if (!all.length) return null;
     if (!near) return all[all.length - 1];
 
-    // The last one that starts before `near` — Node.compareDocumentPosition
+    // The last one that starts before `near`: Node.compareDocumentPosition
     // rather than geometry, so it follows the document, not the layout.
     var best = null;
     for (var i = 0; i < all.length; i++) {
