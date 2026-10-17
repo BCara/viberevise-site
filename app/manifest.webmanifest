@@ -1,5 +1,5 @@
 {
-  "name": "VibeRevise: fix the words, keep the file",
+  "name": "VibeRevise",
   "short_name": "VibeRevise",
   "description": "Edit the text of an HTML document and save it with the markup untouched.",
   "id": "/app/",

@@ -10,33 +10,33 @@
 <meta property="og:description" content="What VibeRevise does with your information: almost nothing.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://viberevise.com/privacy.html">
-<meta property="og:image" content="https://viberevise.com/app/icons/icon512.png">
+<meta property="og:image" content="https://viberevise.com/screenshot.png">
 <meta name="theme-color" content="#f7f7fb" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0f1020" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/app/icons/icon32.png" sizes="32x32">
 <link rel="icon" href="/app/icons/icon192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="/app/icons/icon192.png">
-<link rel="stylesheet" href="/site.css">
+<link rel="stylesheet" href="/site.css?v=d60f4b8db1">
 <style>
 :root{--paper:#f7f7fb;--panel:#ffffff;--ink:#15151f;--muted:#5b5d72;--line:#e2e2ee;--accent:#4f46e5;--accent2:#9333ea;--accent-ink:#ffffff;--tint:#eeedfd;--font-display:system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;--font-body:system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;color-scheme:light dark;}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#0f1020;--panel:#181a2e;--ink:#e9e9f5;--muted:#a3a5bd;--line:#2a2c45;--accent:#a5a1ff;--accent2:#d8a8ff;--accent-ink:#10101c;--tint:#22224a;}}
 :root[data-theme="dark"]{--paper:#0f1020;--panel:#181a2e;--ink:#e9e9f5;--muted:#a3a5bd;--line:#2a2c45;--accent:#a5a1ff;--accent2:#d8a8ff;--accent-ink:#10101c;--tint:#22224a;}
 </style>
 </head>
-<body>
+<body class="layout-vibe page">
 <header class="nav"><div class="wrap">
-  <a class="logo" href="/"><img src="/app/icons/icon192.png" alt="" width="30" height="30">VibeRevise</a>
+  <a class="logo" href="/"><picture><source srcset="/logo-dark.svg" media="(prefers-color-scheme: dark)"><img src="/logo-light.svg" alt="VibeRevise" width="165" height="27"></picture></a>
   <nav class="nav-links" aria-label="Sections">
-    <a href="/#features">Features</a><a href="/#ai">AI</a><a href="/#pricing">Pricing</a><a href="/#faq">FAQ</a>
+    <a href="/#features">Features</a><a href="/#ai">AI</a><a href="/#faq">Questions</a>
   </nav>
-  <a class="btn primary small" href="/app/">Open the app</a>
+  <a class="nav-app" href="/app/">Open the app</a>
 </div></header>
 <main class="wrap"><article class="prose">
 <h1>VibeRevise: privacy policy</h1>
 <p><em>Last updated 4 October 2026.</em></p>
 <p>VibeRevise is a browser extension and web app for fixing the words in an HTML document without disturbing its markup. This policy says what it does with your information. The short version: almost nothing, and nothing leaves your browser unless you turn on AI with your own key. Even then, it only goes to the AI service you chose, and only when you ask.</p>
 <h2>What stays in your browser</h2>
-<ul><li><strong>Your documents.</strong> VibeRevise reads the document you open and edits it in your browser. It never uploads it anywhere of ours: there is nowhere of ours. Saving writes the file back to your computer, or to the server the document came from if that server accepts it.</li><li><strong>Your name</strong>, if you type one. It is stored in your browser and written into the comments you add to documents you save. It is self-declared, not a sign-in.</li><li><strong>Whether comments are shown in the document.</strong> A single on-or-off setting.</li><li><strong>Your editing session, so a reload does not lose it.</strong> From the moment you start editing a document, VibeRevise keeps a copy of it as you opened it (and as you last reviewed it), your unsaved changes and the list of changes in this browser's storage, under the document's address. That is what lets it put your work back after a reload, and show what another program changed in the file meanwhile. It is never sent anywhere. The newest eight are kept, for two weeks at most, and <strong>Start fresh</strong> forgets one straight away.</li><li><strong>The file, looked at again while you edit.</strong> To notice another program changing it, VibeRevise reads the file again every few seconds while you are editing it and the page is in view. It reads it the way it first did, from your own disk or your own server, and compares it in your browser. Nothing is sent anywhere.</li><li><strong>Your AI settings</strong>, if you add them: the provider, its address, the model and your API key. They are kept in this browser only and are not synced. In the extension they are read only by VibeRevise's own settings page and background worker, never by the pages you edit.</li></ul>
+<ul><li><strong>Your documents.</strong> VibeRevise reads the document you open and edits it in your browser. It never uploads it anywhere of ours: there is nowhere of ours. Saving writes the file back to your computer, or to the server the document came from if that server accepts it.</li><li><strong>Your name</strong>, if you type one. It is stored in your browser and written into the comments you add to documents you save. It is whatever you choose to type, and there is no account behind it.</li><li><strong>Whether comments are shown in the document.</strong> A single setting, on or off.</li><li><strong>Your editing session, so a reload does not lose it.</strong> From the moment you start editing a document, VibeRevise keeps a copy of it as you opened it (and as you last reviewed it), your unsaved changes and the list of changes in this browser's storage, under the document's address. That is what lets it put your work back after a reload, and show what another program changed in the file meanwhile. It is never sent anywhere. The newest eight are kept, for two weeks at most, and <strong>Start fresh</strong> forgets one straight away.</li><li><strong>The file, looked at again while you edit.</strong> To notice another program changing it, VibeRevise reads the file again every few seconds while you are editing it and the page is in view. It reads it the way it first did, from your own disk or your own server, and compares it in your browser. Nothing is sent anywhere.</li><li><strong>Your AI settings</strong>, if you add them: the provider, its address, the model and your API key. They are kept in this browser only and are not synced. In the extension they are read only by VibeRevise's own settings page and background worker, never by the pages you edit.</li></ul>
 <p>Clear any of these from VibeRevise's settings, or by removing the extension.</p>
 <h2>What leaves your browser</h2>
 <p>Nothing, except in two cases you choose yourself:</p>
@@ -50,10 +50,10 @@
 <p>This site sets no cookies and runs no analytics, and it loads nothing from anyone else: no web fonts, no trackers. Like any website, the service that hosts it may keep ordinary server logs, such as the addresses that requested pages.</p>
 </article></main>
 <footer><div class="wrap">
-  <span>© 2026 VibeRevise</span>
+  <span>VibeRevise, 2026</span>
   <a href="/app/">Web app</a>
   <a href="/privacy.html">Privacy</a>
-  <a href="mailto:codebertcreations@gmail.com">Contact</a>
+  <a href="mailto:codebertcreations@gmail.com">codebertcreations@gmail.com</a>
 </div></footer>
 </body>
 </html>
