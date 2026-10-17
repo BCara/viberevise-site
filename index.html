@@ -3,25 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VibeRevise: fix the wording of an HTML file and leave the code alone</title>
+<title>VibeRevise: edit the text of HTML files without touching the code</title>
 <meta name="description" content="Edit the text of an HTML document in your browser. Only the words you change are changed, and your fixes survive when an AI tool regenerates the file.">
 <link rel="canonical" href="https://viberevise.com/">
-<meta property="og:title" content="VibeRevise: fix the wording of an HTML file and leave the code alone">
+<meta property="og:title" content="VibeRevise: edit the text of HTML files without touching the code">
 <meta property="og:description" content="Edit the text of an HTML document in your browser. Only the words you change are changed, and your fixes survive when an AI tool regenerates the file.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:site_name" content="VibeRevise">
+<meta property="og:locale" content="en_AU">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://viberevise.com/">
 <meta property="og:image" content="https://viberevise.com/screenshot.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:image:alt" content="VibeRevise editing a community garden newsletter, with comments in the margin and the list of changes open">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="VibeRevise: edit the text of HTML files without touching the code">
+<meta name="twitter:description" content="Edit the text of an HTML document in your browser. Only the words you change are changed, and your fixes survive when an AI tool regenerates the file.">
+<meta name="twitter:image" content="https://viberevise.com/screenshot.png">
 <meta name="theme-color" content="#f7f7fb" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0f1020" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="/app/icons/icon32.png" sizes="32x32">
-<link rel="icon" href="/app/icons/icon192.png" sizes="192x192">
+<link rel="icon" href="/app/icons/icon192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/app/icons/icon192.png">
 <link rel="stylesheet" href="/site.css?v=d60f4b8db1">
+<script src="/app/lib/errors.js" data-surface="site" data-part="home" data-brand="viberevise" data-version="0.17.0" defer></script>
 <style>
 :root{--paper:#f7f7fb;--panel:#ffffff;--ink:#15151f;--muted:#5b5d72;--line:#e2e2ee;--accent:#4f46e5;--accent2:#9333ea;--accent-ink:#ffffff;--tint:#eeedfd;--font-display:system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;--font-body:system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;color-scheme:light dark;}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#0f1020;--panel:#181a2e;--ink:#e9e9f5;--muted:#a3a5bd;--line:#2a2c45;--accent:#a5a1ff;--accent2:#d8a8ff;--accent-ink:#10101c;--tint:#22224a;}}
 :root[data-theme="dark"]{--paper:#0f1020;--panel:#181a2e;--ink:#e9e9f5;--muted:#a3a5bd;--line:#2a2c45;--accent:#a5a1ff;--accent2:#d8a8ff;--accent-ink:#10101c;--tint:#22224a;}
 </style>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://viberevise.com/#org","name":"VibeRevise","url":"https://viberevise.com/","logo":"https://viberevise.com/app/icons/icon512.png","email":"codebertcreations@gmail.com"},{"@type":"WebSite","@id":"https://viberevise.com/#site","name":"VibeRevise","url":"https://viberevise.com/","inLanguage":"en-AU","publisher":{"@id":"https://viberevise.com/#org"}},{"@type":"WebApplication","@id":"https://viberevise.com/#app","name":"VibeRevise","url":"https://viberevise.com/app/","description":"Edit the text of an HTML document in your browser. Only the words you change are changed, and your fixes survive when an AI tool regenerates the file.","applicationCategory":"BusinessApplication","operatingSystem":"Any (web browser)","browserRequirements":"Requires a current web browser","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"AUD"},"screenshot":"https://viberevise.com/screenshot.png","featureList":["Edit on the page","Keep your fixes when the file is regenerated","See every change","Leave comments in the file","Save over the original"],"publisher":{"@id":"https://viberevise.com/#org"}},{"@type":"FAQPage","@id":"https://viberevise.com/#faq","mainEntity":[{"@type":"Question","name":"Is my document uploaded anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. VibeRevise opens and edits the document in your browser, and there is no VibeRevise server to send it to. If you turn on AI, the paragraphs you ask about go to the AI service you picked, and only when you press the button."}},{"@type":"Question","name":"Which browsers does it work in?","acceptedAnswer":{"@type":"Answer","text":"The web app runs in any current browser. In Chrome or Edge on a computer, Save writes back to the file you opened. Other browsers download the edited copy for you to save yourself."}},{"@type":"Question","name":"What can’t it change?","acceptedAnswer":{"@type":"Answer","text":"Layout, styles and images are left alone. VibeRevise changes words, and can add paragraphs, lists, tables, bold and italic in the same style as the ones already in the document. Pages that build their text with JavaScript can’t be edited, because the words aren’t in the file."}},{"@type":"Question","name":"Do I need AI to use it?","acceptedAnswer":{"@type":"Answer","text":"No. All the editing works without it, and AI stays off until you add a key."}},{"@type":"Question","name":"Is it free?","acceptedAnswer":{"@type":"Answer","text":"Yes, while it’s in beta, with no account and no card. If that ever changes, it will be announced on this page first. AI usage is billed by your AI provider at their prices; VibeRevise adds nothing."}}]}]}</script>
 </head>
 <body class="layout-vibe">
 <div class="stage">
@@ -87,7 +98,7 @@
 </div></section>
 
 <figure class="shot"><div class="wrap">
-  <div class="frame"><img src="/screenshot.png" width="1280" height="800" alt="VibeRevise editing a community garden newsletter, with comments in the margin and the list of changes open"></div>
+  <div class="frame"><img src="/screenshot.png" width="1280" height="800" loading="lazy" decoding="async" alt="VibeRevise editing a community garden newsletter, with comments in the margin and the list of changes open"></div>
   <figcaption>Two edits, a reply to a comment, and the list of changes that Save will write.</figcaption>
 </div></figure>
 

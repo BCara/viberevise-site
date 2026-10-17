@@ -13,6 +13,9 @@
   --paper: #f6f7f8;
   --accent: #2f5fd0;
   --accent-ink: #ffffff;
+  --panel: #ffffff;
+  --tint: #e8eefb;
+  --font-display: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --warn: #9a3412;
   --warn-bg: #fff3e8;
   --chrome-h: 52px;
@@ -25,6 +28,8 @@
     --paper: #15181b;
     --accent: #7ba3f5;
     --accent-ink: #10131a;
+    --panel: #1c2024;
+    --tint: #1d2840;
     --warn: #f0b088;
     --warn-bg: #2d1e14;
   }
@@ -130,51 +135,268 @@ body {
   background: #fff;   /* the document brings its own; never show ours through */
 }
 
-/* ---- welcome ---------------------------------------------------------- */
+/* ---- welcome ----------------------------------------------------------
+ *
+ * The one screen that is ours rather than the document's, so it can say a
+ * little more: what the tool does, a picture of it doing it, and a sample to
+ * try it on. It all goes away the moment a file opens.
+ */
 .welcome {
   flex: 1 1 auto;
   overflow-y: auto;
-  padding: 32px 20px 48px;
+  padding: 28px 20px 56px;
   padding-left: max(20px, env(safe-area-inset-left));
   padding-right: max(20px, env(safe-area-inset-right));
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  gap: 36px;
+  /* A tinted wash behind the hero, for some depth without an image. */
+  background:
+    radial-gradient(60rem 26rem at 85% -6rem, var(--tint), transparent 70%),
+    var(--paper);
+}
+.welcome > * {
+  width: 100%;
+  max-width: 68rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero {
+  display: grid;
+  gap: 32px;
+  align-items: center;
+}
+.hero-copy {
+  display: flex;
+  flex-direction: column;
   align-items: flex-start;
   gap: 14px;
-  max-width: 44rem;
-  margin: 0 auto;
+  min-width: 0;
+}
+.eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 .welcome h1 {
-  font-size: clamp(1.6rem, 5.5vw, 2.1rem);
-  line-height: 1.15;
-  letter-spacing: -.02em;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -.025em;
   margin: 0;
   text-wrap: balance;
 }
 .lede {
   margin: 0;
   color: var(--muted);
-  max-width: 40ch;
+  font-size: 16px;
+  max-width: 44ch;
 }
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+.hero-actions .btn:not(.primary) { background: var(--panel); }
 .drop-hint {
   margin: 0;
   color: var(--muted);
   font-size: 13px;
 }
+.assure {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.assure li::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: 1px;
+}
+
+/* The picture: a page of a document mid-edit, with notes in its margin. */
+.preview {
+  position: relative;
+  margin: 0;
+  padding: 26px 0 104px;
+  min-width: 0;
+}
+.page {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 18px 48px -18px rgba(0, 0, 0, .28);
+  overflow: hidden;
+  width: min(100%, 29rem);
+}
+.page-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+}
+.page-bar span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.page-bar b { font-weight: 500; margin-left: 8px; }
+.page-body {
+  padding: 18px 22px 22px;
+  font: 14px/1.6 Georgia, Charter, Cambria, serif;
+}
+.page-body p { margin: 0 0 9px; }
+.page-body .p-title {
+  font: 700 17px/1.3 system-ui, -apple-system, "Segoe UI", sans-serif;
+  margin-bottom: 12px;
+}
+.page-body del {
+  color: var(--accent);
+  text-decoration-thickness: 2px;
+}
+.page-body ins {
+  text-decoration: none;
+  color: var(--accent);
+  background: var(--tint);
+  border-bottom: 2px solid var(--accent);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+.page-body mark {
+  background: rgba(245, 200, 75, .38);
+  color: inherit;
+  border-radius: 2px;
+}
+.p-rows { display: grid; gap: 7px; margin-top: 14px; }
+.p-rows i {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--line);
+}
+.p-rows i:nth-child(2) { width: 86%; }
+.p-rows i:nth-child(3) { width: 64%; }
+
+.note {
+  position: absolute;
+  width: min(15.5rem, 62%);
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, .35);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.note b {
+  display: block;
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+.note-comment {
+  right: 0;
+  top: 0;
+  width: min(13.5rem, 52%);
+  border-left: 3px solid #e0a82e;
+}
+.note-ai {
+  right: 0;
+  bottom: 0;
+  border-left: 3px solid var(--accent);
+}
+.note-ai b { color: var(--accent); }
+.note-actions { display: flex; gap: 6px; margin-top: 8px; }
+.chip {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.chip.ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+/* How it works, in three. */
+.steps {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.steps li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  font-size: 14px;
+  color: var(--muted);
+}
+.steps b { color: var(--ink); }
+.step-n {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--tint);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 13px;
+}
 
 .how {
-  margin: 18px 0 0;
   display: grid;
-  gap: 16px;
-  width: 100%;
+  gap: 26px 28px;
 }
 .how > div {
   border-top: 1px solid var(--line);
-  padding-top: 12px;
+  padding-top: 14px;
+}
+.how svg {
+  width: 22px;
+  height: 22px;
+  margin-bottom: 6px;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .how dt {
-  font-weight: 600;
-  font-size: 13px;
+  font-weight: 650;
+  font-size: 14px;
   margin-bottom: 3px;
 }
 .how dd {
@@ -183,8 +405,65 @@ body {
   font-size: 14px;
   max-width: 52ch;
 }
+.linkish {
+  font: inherit;
+  color: var(--accent);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.keys {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  padding: 16px 18px;
+}
+.keys h2 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 650;
+}
+.keys ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px 24px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.keys li { display: flex; align-items: center; gap: 10px; }
+.keys .combo { flex: none; display: inline-flex; gap: 3px; }
+kbd {
+  font: 600 11.5px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ink);
+  padding: 4px 6px;
+  min-width: 22px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--paper);
+}
+
 @media (min-width: 700px) {
-  .how { grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .steps { grid-template-columns: repeat(3, 1fr); }
+  .how { grid-template-columns: repeat(2, 1fr); }
+  .keys ul { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 960px) {
+  .welcome { padding-top: 56px; gap: 48px; }
+  .hero { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 48px; }
+  .how { grid-template-columns: repeat(3, 1fr); }
+  .keys ul { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 520px) {
+  .preview { padding: 0; }
+  .note { position: static; width: auto; margin-top: 10px; }
 }
 
 /* Phone: the filename and the two controls earn their space; the wordmark does
@@ -218,10 +497,8 @@ body {
 
 /* ---- opening from your own network ------------------------------------ */
 .network {
-  width: 100%;
-  margin-top: 6px;
   border-top: 1px solid var(--line);
-  padding-top: 18px;
+  padding-top: 22px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -389,8 +666,8 @@ body {
 .settings label.choice input { width: auto; min-height: 0; margin: 3px 0 0; flex: none; }
 
 /* ---- brand: VibeRevise (added by sites/brand-app.js) ---------------- */
-:root { --paper: #f7f7fb; --ink: #15151f; --muted: #5b5d72; --line: #e2e2ee; --accent: #4f46e5; --accent-ink: #ffffff; }
+:root { --paper: #f7f7fb; --panel: #ffffff; --tint: #eeedfd; --ink: #15151f; --muted: #5b5d72; --line: #e2e2ee; --accent: #4f46e5; --accent-ink: #ffffff; --font-display: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --paper: #0f1020; --ink: #e9e9f5; --muted: #a3a5bd; --line: #2a2c45; --accent: #a5a1ff; --accent-ink: #10101c; }
+  :root:not([data-theme="light"]) { --paper: #0f1020; --panel: #181a2e; --tint: #22224a; --ink: #e9e9f5; --muted: #a3a5bd; --line: #2a2c45; --accent: #a5a1ff; --accent-ink: #10101c; }
 }
 .brand { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: inherit; text-decoration: none; }

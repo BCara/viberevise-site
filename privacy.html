@@ -8,20 +8,31 @@
 <link rel="canonical" href="https://viberevise.com/privacy.html">
 <meta property="og:title" content="VibeRevise: privacy policy">
 <meta property="og:description" content="What VibeRevise does with your information: almost nothing.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:site_name" content="VibeRevise">
+<meta property="og:locale" content="en_AU">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://viberevise.com/privacy.html">
 <meta property="og:image" content="https://viberevise.com/screenshot.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta property="og:image:alt" content="VibeRevise editing a community garden newsletter, with comments in the margin and the list of changes open">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="VibeRevise: privacy policy">
+<meta name="twitter:description" content="What VibeRevise does with your information: almost nothing.">
+<meta name="twitter:image" content="https://viberevise.com/screenshot.png">
 <meta name="theme-color" content="#f7f7fb" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0f1020" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="/app/icons/icon32.png" sizes="32x32">
-<link rel="icon" href="/app/icons/icon192.png" sizes="192x192">
+<link rel="icon" href="/app/icons/icon192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/app/icons/icon192.png">
 <link rel="stylesheet" href="/site.css?v=d60f4b8db1">
+<script src="/app/lib/errors.js" data-surface="site" data-part="privacy" data-brand="viberevise" data-version="0.17.0" defer></script>
 <style>
 :root{--paper:#f7f7fb;--panel:#ffffff;--ink:#15151f;--muted:#5b5d72;--line:#e2e2ee;--accent:#4f46e5;--accent2:#9333ea;--accent-ink:#ffffff;--tint:#eeedfd;--font-display:system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;--font-body:system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;color-scheme:light dark;}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#0f1020;--panel:#181a2e;--ink:#e9e9f5;--muted:#a3a5bd;--line:#2a2c45;--accent:#a5a1ff;--accent2:#d8a8ff;--accent-ink:#10101c;--tint:#22224a;}}
 :root[data-theme="dark"]{--paper:#0f1020;--panel:#181a2e;--ink:#e9e9f5;--muted:#a3a5bd;--line:#2a2c45;--accent:#a5a1ff;--accent2:#d8a8ff;--accent-ink:#10101c;--tint:#22224a;}
 </style>
+
 </head>
 <body class="layout-vibe page">
 <header class="nav"><div class="wrap">
@@ -33,21 +44,23 @@
 </div></header>
 <main class="wrap"><article class="prose">
 <h1>VibeRevise: privacy policy</h1>
-<p><em>Last updated 4 October 2026.</em></p>
-<p>VibeRevise is a browser extension and web app for fixing the words in an HTML document without disturbing its markup. This policy says what it does with your information. The short version: almost nothing, and nothing leaves your browser unless you turn on AI with your own key. Even then, it only goes to the AI service you chose, and only when you ask.</p>
+<p><em>Last updated 17 October 2026.</em></p>
+<p>VibeRevise is a browser extension and web app for fixing the words in an HTML document without disturbing its markup. This policy says what it does with your information. The short version: almost nothing. Your documents never leave your browser unless you turn on AI with your own key, and even then they only go to the AI service you chose, and only when you ask. If VibeRevise itself breaks, it sends us a short error report, which never includes your document.</p>
 <h2>What stays in your browser</h2>
 <ul><li><strong>Your documents.</strong> VibeRevise reads the document you open and edits it in your browser. It never uploads it anywhere of ours: there is nowhere of ours. Saving writes the file back to your computer, or to the server the document came from if that server accepts it.</li><li><strong>Your name</strong>, if you type one. It is stored in your browser and written into the comments you add to documents you save. It is whatever you choose to type, and there is no account behind it.</li><li><strong>Whether comments are shown in the document.</strong> A single setting, on or off.</li><li><strong>Your editing session, so a reload does not lose it.</strong> From the moment you start editing a document, VibeRevise keeps a copy of it as you opened it (and as you last reviewed it), your unsaved changes and the list of changes in this browser's storage, under the document's address. That is what lets it put your work back after a reload, and show what another program changed in the file meanwhile. It is never sent anywhere. The newest eight are kept, for two weeks at most, and <strong>Start fresh</strong> forgets one straight away.</li><li><strong>The file, looked at again while you edit.</strong> To notice another program changing it, VibeRevise reads the file again every few seconds while you are editing it and the page is in view. It reads it the way it first did, from your own disk or your own server, and compares it in your browser. Nothing is sent anywhere.</li><li><strong>Your AI settings</strong>, if you add them: the provider, its address, the model and your API key. They are kept in this browser only and are not synced. In the extension they are read only by VibeRevise's own settings page and background worker, never by the pages you edit.</li></ul>
 <p>Clear any of these from VibeRevise's settings, or by removing the extension.</p>
 <h2>What leaves your browser</h2>
-<p>Nothing, except in two cases you choose yourself:</p>
+<p>Your documents, nothing, except in two cases you choose yourself:</p>
 <ul><li><strong>Saving to your own server.</strong> If the document you are editing was served over your own network, saving sends it back to that same server, because that is where the file lives.</li><li><strong>AI suggestions, if you add an API key.</strong> AI is off until you add a key for a service you choose: Anthropic, OpenAI, OpenRouter, Google Gemini, or any compatible address, including a model on your own computer. When you press a button asking for a suggestion, VibeRevise sends that service the words of the paragraphs involved. A rewrite also sends a little of the text either side for context, asking for an explanation sends the words you selected or the paragraph you are in, with a little text either side, and asking about a comment thread also sends the thread. It never sends the whole file or its markup. The request goes from your browser straight to the service, with your key; it does not pass through anything of ours. What that service does with it is governed by your agreement with them. A model on your own computer keeps it on your machine.</li></ul>
-<p>Nothing is sent anywhere else: no analytics, no crash reports, no tracking, no advertising, no account, and no AI service of ours.</p>
+<p>And one thing that is not about your documents at all:</p>
+<ul><li><strong>Error reports.</strong> When something in VibeRevise goes wrong (a bug in the extension, the web app or this website), it sends us a short report so we can fix it. A report holds the error message and where in VibeRevise's own code it happened, which part of VibeRevise it was, the version, your browser's name and version (its user agent), and the time. In the web app and on this website it also holds the page's path on our site, such as <code>/app/</code>. It never holds your document, any text from it, its address or file name, your name, your comments or your AI key: before a report leaves, any web address or file path that is not one of VibeRevise's own scripts, and anything shaped like a key, is blanked out. Reports are not linked to you or to each other, and no cookie or identifier goes with them. They are stored with Google Firebase (Cloud Firestore, in the United States), where only we can read them, and are deleted after 90 days.</li></ul>
+<p>Nothing else is sent anywhere: no analytics, no tracking, no advertising, no account, and no AI service of ours.</p>
 <h2>What we never do</h2>
-<p>We do not collect, sell, share or use your data. We do not run servers that receive it. We do not use it to determine creditworthiness or for any purpose other than the feature you invoked.</p>
+<p>We do not collect, sell, share or use your documents or anything in them. We do not run servers that receive them. Error reports are used only to find and fix bugs, and are never sold or shared. We do not use it to determine creditworthiness or for any purpose other than the feature you invoked.</p>
 <h2>Contact</h2>
 <p>Questions: codebertcreations@gmail.com</p>
 <h2>This website</h2>
-<p>This site sets no cookies and runs no analytics, and it loads nothing from anyone else: no web fonts, no trackers. Like any website, the service that hosts it may keep ordinary server logs, such as the addresses that requested pages.</p>
+<p>This site sets no cookies and runs no analytics, and it loads nothing from anyone else: no web fonts, no trackers. If a page on it breaks, it sends the same short error report the app does, described above. Like any website, the service that hosts it may keep ordinary server logs, such as the addresses that requested pages.</p>
 </article></main>
 <footer><div class="wrap">
   <span>VibeRevise, 2026</span>

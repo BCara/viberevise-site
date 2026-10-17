@@ -64,6 +64,7 @@ var RECENTS_KEY = 'viberevise:recent-network-documents';
 var STORE = {
   author: 'viberevise:author',
   commentsVisible: 'viberevise:comments-visible',
+  tourSeen: 'viberevise:tour-seen',
 };
 
 function readStore(key) {
@@ -80,7 +81,7 @@ var SETTINGS = {
   get: function (key) {
     var raw = readStore(STORE[key] || key);
     // The editor stores a boolean here; localStorage only holds strings.
-    if (key === 'commentsVisible') return Promise.resolve(raw === 'true');
+    if (key === 'commentsVisible' || key === 'tourSeen') return Promise.resolve(raw === 'true');
     return Promise.resolve(raw);
   },
   set: function (key, value) {
@@ -341,6 +342,7 @@ async function load(source, name, handle, url) {
     source: source,
     map: map,
     filename: current.name,
+    sourceUrl: current.url || '',
     saveFile: saveFile,
     settings: SETTINGS,
     ai: AI ? AI_HOST : null,
@@ -678,6 +680,22 @@ function openFromQuery() {
 
 els.open.addEventListener('click', openFile);
 els.openMain.addEventListener('click', openFile);
+
+// A document to try it on, for anyone who came to look before they have one
+// to hand. It ships with the app, so it opens offline too. There is no file
+// behind it, so Save hands over a copy rather than writing anywhere.
+document.getElementById('try-sample').addEventListener('click', function () {
+  fetch('sample.html', { cache: 'no-cache' })
+    .then(function (r) { if (!r.ok) throw new Error(r.status + ' ' + r.statusText); return r.text(); })
+    .then(function (text) { return load(text, 'sample-q3-update.html', null); })
+    .catch(function (err) { toast('Could not open the sample: ' + err.message, 'warn'); });
+});
+document.getElementById('ai-settings-link').addEventListener('click', function () { openSettings(true); });
+
+// The shortcuts list says Cmd on a Mac, where Ctrl does something else.
+if (/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) {
+  document.querySelectorAll('kbd.mod').forEach(function (k) { k.textContent = '⌘'; });
+}
 
 (function wireNetworkPanel() {
   var toggle = document.getElementById('net-toggle');

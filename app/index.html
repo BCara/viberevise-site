@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>VibeRevise</title>
-<meta name="description" content="Fix the words in an HTML document without disturbing the markup.">
+<title>VibeRevise web app: edit HTML documents in your browser</title>
+<meta name="description" content="Edit the text of an HTML document and save it with the markup untouched.">
+<link rel="canonical" href="https://viberevise.com/app/">
 <link rel="stylesheet" href="app.css">
 
 <!-- Installable: an icon on the home screen and its own window, rather than a
@@ -31,15 +32,123 @@
 
 <main id="stage">
   <section class="welcome" id="welcome">
-    <h1>Fix the words. Keep the file.</h1>
-    <p class="lede">
-      Open an HTML document, click any text and type. What you save is the file
-      you opened, with only the words you changed replaced: the markup,
-      indentation, comments and entities all exactly as they were.
-    </p>
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">An editor for finished HTML documents</p>
+        <h1>Fix the words. Keep the file.</h1>
+        <p class="lede">
+          Open an HTML document, click any text and type. What you save is the file
+          you opened, with only the words you changed replaced: the markup,
+          indentation, comments and entities all exactly as they were.
+        </p>
 
-    <button id="open-main" class="btn big primary">Open an HTML file</button>
-    <p class="drop-hint" id="drop-hint">or drop one anywhere on this page</p>
+        <div class="hero-actions">
+          <button id="open-main" class="btn big primary">Open an HTML file</button>
+          <button id="try-sample" class="btn big" title="A short report with a few mistakes left in it">Try a sample</button>
+        </div>
+        <p class="drop-hint" id="drop-hint">or drop one anywhere on this page</p>
+
+        <ul class="assure">
+          <li>No account</li>
+          <li>Nothing uploaded</li>
+          <li>Works offline</li>
+        </ul>
+      </div>
+
+      <!-- A picture of what editing looks like, drawn in markup so it takes the
+           brand's colours and the reader's light or dark scheme. -->
+      <figure class="preview" aria-hidden="true">
+        <div class="page">
+          <div class="page-bar"><span></span><span></span><span></span><b>q3-update.html</b></div>
+          <div class="page-body">
+            <p class="p-title">Harbourside Café: Q3 update</p>
+            <p class="p-line">Revenue grew by 9% over the quarter, helped by the
+              new breakfast menu and a dry September.</p>
+            <p class="p-line">Staff turnover fell for <del>teh</del> <ins>the</ins>
+              second quarter running.</p>
+            <p class="p-line"><mark>We expect a quieter December</mark> <del>then</del>
+              <ins>than</ins> last year.</p>
+            <div class="p-rows"><i></i><i></i><i></i></div>
+          </div>
+        </div>
+        <div class="note note-comment">
+          <b>Comment</b>
+          Should we say why? The road works start in November.
+        </div>
+        <div class="note note-ai">
+          <b>AI suggestion</b>
+          “We expect a quieter December than last year, while the road works run.”
+          <span class="note-actions"><span class="chip">Accept</span><span class="chip ghost">Dismiss</span></span>
+        </div>
+      </figure>
+    </div>
+
+    <ol class="steps" aria-label="How it works">
+      <li>
+        <span class="step-n">1</span>
+        <div><b>Open</b> an HTML file from your computer, your network, or the sample.</div>
+      </li>
+      <li>
+        <span class="step-n">2</span>
+        <div><b>Edit in place.</b> Click text and type, comment in the margin, or ask AI for a second opinion.</div>
+      </li>
+      <li>
+        <span class="step-n">3</span>
+        <div><b>Save.</b> Only your words change. Every edit is listed with who made it.</div>
+      </li>
+    </ol>
+
+    <dl class="how">
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.4-3 8.3-7 10-4-1.7-7-5.6-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+        <dt>Nothing is uploaded</dt>
+        <dd>Your document is opened and edited in this browser tab. It is not
+            sent anywhere, unless you turn on AI with your own key, and then
+            only the paragraphs you ask about, to the service you chose.</dd>
+      </div>
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4"/><path d="M8 20v-6h8v6"/></svg>
+        <dt id="save-story-title">Saving</dt>
+        <dd id="save-story">Checking what this browser allows…</dd>
+      </div>
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>
+        <dt>What you can change</dt>
+        <dd>Words, and adding another paragraph, list or table like one already
+            there. Not layout, styling or images: that restraint is what keeps
+            the file intact.</dd>
+      </div>
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
+        <dt>Review that travels</dt>
+        <dd>Comments, replies and the list of changes are saved inside the
+            HTML itself, so whoever opens the file next can read them.</dd>
+      </div>
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"/><path d="M18 15l.8 2 2 .8-2 .7-.8 2-.7-2-2-.7 2-.8z"/></svg>
+        <dt>AI, if you want it</dt>
+        <dd>Add your own key in <button type="button" class="linkish" id="ai-settings-link">Settings</button>
+            to have AI explain, proofread or suggest wording. It suggests;
+            you decide.</dd>
+      </div>
+      <div>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/></svg>
+        <dt>Undo anything</dt>
+        <dd>Each change can be undone on its own, and if another tool rewrites
+            the file while you work, you see what changed before you save.</dd>
+      </div>
+    </dl>
+
+    <section class="keys" aria-labelledby="keys-title">
+      <h2 id="keys-title">Shortcuts</h2>
+      <ul>
+        <li><span class="combo"><kbd class="mod">Ctrl</kbd><kbd>S</kbd></span> <span>Save</span></li>
+        <li><span class="combo"><kbd class="mod">Ctrl</kbd><kbd>Shift</kbd><kbd>S</kbd></span> <span>Save as</span></li>
+        <li><span class="combo"><kbd class="mod">Ctrl</kbd><kbd>B</kbd> <kbd class="mod">Ctrl</kbd><kbd>I</kbd></span> <span>Bold, italic</span></li>
+        <li><span class="combo"><kbd class="mod">Ctrl</kbd><kbd>Z</kbd> <kbd class="mod">Ctrl</kbd><kbd>Y</kbd></span> <span>Undo, redo</span></li>
+        <li><span class="combo"><kbd class="mod">Ctrl</kbd><kbd>Enter</kbd></span> <span>Another paragraph, item or row</span></li>
+      </ul>
+    </section>
 
     <section class="network">
       <button id="net-toggle" class="btn" aria-expanded="false" aria-controls="net-form">
@@ -70,25 +179,6 @@
         <ul id="recents" class="recents"></ul>
       </div>
     </section>
-
-    <dl class="how">
-      <div>
-        <dt>Nothing is uploaded</dt>
-        <dd>Your document is opened and edited in this browser tab. It is not
-            sent anywhere, unless you turn on AI with your own key, and then
-            only the paragraphs you ask about, to the service you chose.</dd>
-      </div>
-      <div>
-        <dt id="save-story-title">Saving</dt>
-        <dd id="save-story">Checking what this browser allows…</dd>
-      </div>
-      <div>
-        <dt>What you can change</dt>
-        <dd>Words, and adding another paragraph, list or table like one already
-            there. Not layout, styling or images: that restraint is what keeps
-            the file intact.</dd>
-      </div>
-    </dl>
   </section>
 
   <iframe id="frame" hidden title="The document you are editing"
@@ -158,6 +248,7 @@
 </dialog>
 
 <!-- The engine and the editor, exactly as the extension loads them. -->
+<script src="lib/errors.js" data-surface="app" data-part="app" data-version="0.17.0"></script>
 <script src="lib/tokenizer.js"></script>
 <script src="lib/splice.js"></script>
 <script src="lib/origins.js"></script>

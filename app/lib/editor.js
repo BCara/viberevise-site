@@ -120,6 +120,9 @@
     source: '',
     map: null,
     filename: 'page.html',
+    sourceUrl: '',        // the document's URL, supplied by a host editing in a frame
+    tour: null,           // Teach me, while it is on screen
+    tourSeen: true,       // until the host says otherwise: never offer it twice
     regions: [],
     trees: [],            // inserted structures: one tree, many editable cells
     byIsland: null,
@@ -266,6 +269,7 @@
     '.bar.paused .more-btn, .bar.paused .panel, .bar.paused .ai-btn, .bar.paused .sep,',
     '.bar.paused .outside-btn { display: none; }',
     '.outside-btn { color: #9fd6ef; }',
+    'button.help { font-weight: 700; font-size: 12.5px; padding: 4px 9px; }',
     '.outside-btn[aria-pressed="false"] { opacity: .55; text-decoration: line-through; }',
     '.sep { width: 1px; align-self: stretch; margin: 2px 1px; background: rgba(255, 255, 255, .16); flex: none; }',
     // The count reads as text but opens the list of changes.
@@ -305,7 +309,7 @@
     '  font-weight: 600; cursor: pointer;',
     '}',
     '.p-check input { flex: none; margin: 0; accent-color: #d9a01e; cursor: pointer; }',
-    '.p-changes { text-align: left; border-radius: 7px; }',
+    '.p-changes, .p-share-review { text-align: left; border-radius: 7px; }',
     // The bar's comment button wears the same bubble as the one beside a
     // paragraph, so the two are recognisably the same thing in two places.
     'button.icon svg { width: 14px; height: 14px; fill: currentColor; display: block; }',
@@ -1528,12 +1532,13 @@
     // below because it carries no modifier.
     if (e.key === 'Escape' &&
         (isMenuOpen() || isAddMenuOpen() || isMoreOpen() || isChangesOpen() ||
-         isAIOpen() || isReviewOpen())) {
+         isAIOpen() || isReviewOpen() || isShareReviewOpen())) {
       e.preventDefault();
       setMenuOpen(false);
       setMoreOpen(false);
       setAIOpen(false);
       closeReview();
+      closeShareReview();
       if (isAddMenuOpen()) { setAddMenuOpen(false); hideAdd(); }
       closeChanges();
       return;
@@ -1592,7 +1597,7 @@
     if (!state.active) return;
     var el = e.target && e.target.nodeType === 1 ? e.target : null;
     var link = el && el.closest ? el.closest('a[href]') : null;
-    if (link && (link.getAttribute('href') || '').charAt(0) !== '#') {
+    if (link && !link.hasAttribute(UI_ATTR) && (link.getAttribute('href') || '').charAt(0) !== '#') {
       e.preventDefault();
       flash('Links do not navigate while edit mode is on');
     }
@@ -2554,6 +2559,7 @@
             'ways, and rewrites every comment next time you save.</div>' +
           '<div class="p-sep"></div>' +
           '<button class="p-changes">Show changes</button>' +
+          '<button class="p-share-review">Share review…</button>' +
           '<button class="p-changes p-saveas" title="Ctrl/Cmd+Shift+S">Save as\u2026</button>' +
         '</div>' +
         (state.ai ? AI_MARKUP : '') +
@@ -2562,6 +2568,8 @@
         '<button class="save primary" disabled>Save</button>' +
         '<button class="pause" title="Stop editing for now, so you can select and copy text">Pause</button>' +
         '<button class="done">Done</button>' +
+        '<button class="help icon" title="Teach me: a quick tour of what you can do" ' +
+                'aria-label="Teach me">?</button>' +
       '</div>';
 
     doc().documentElement.appendChild(host);
@@ -2579,6 +2587,7 @@
       save: shadow.querySelector('.save'),
       done: shadow.querySelector('.done'),
       pause: shadow.querySelector('.pause'),
+      help: shadow.querySelector('.help'),
       bar: shadow.querySelector('.bar'),
       label: shadow.querySelector('.label'),
       moreBtn: shadow.querySelector('.more-btn'),
@@ -2586,6 +2595,7 @@
       authorInput: shadow.querySelector('.p-input'),
       authorSave: shadow.querySelector('.p-save'),
       changesBtn: shadow.querySelector('.p-changes'),
+      shareReviewBtn: shadow.querySelector('.p-share-review'),
       saveAsBtn: shadow.querySelector('.p-saveas'),
       outsideBtn: shadow.querySelector('.outside-btn'),
       info: shadow.querySelector('.p-info'),
@@ -2631,12 +2641,14 @@
     ui.redo.addEventListener('mousedown', function (e) { e.preventDefault(); redo(); });
     ui.save.addEventListener('click', function () { save(); });
     ui.saveAsBtn.addEventListener('click', function () { setMoreOpen(false); saveAs(); });
+    ui.shareReviewBtn.addEventListener('click', openShareReview);
     ui.outsideBtn.addEventListener('mousedown', function (e) {
       e.preventDefault();
       setShowOutside(!state.showOutside);
     });
     ui.done.addEventListener('click', function () { setActive(false); });
     ui.pause.addEventListener('click', function () { setPaused(!state.paused); });
+    ui.help.addEventListener('click', function () { startTour(); });
 
     ui.count.addEventListener('mousedown', function (e) {
       e.preventDefault();
@@ -3045,6 +3057,7 @@
   }
 
   function openChanges() {
+    closeShareReview();
     closeReview();
     ensureAssist().changes.hidden = false;
     renderChanges();
@@ -3260,6 +3273,157 @@
     return item;
   }
 
+  // --- a review that can travel without the document or the extension ---------
+
+  function reviewQuote(block) {
+    if (!block) return '';
+    var copy = block.cloneNode(true);
+    copy.querySelectorAll('[' + UI_ATTR + '], [data-vr-comment], script, style, template')
+      .forEach(function (el) { el.remove(); });
+    copy.querySelectorAll('br').forEach(function (el) { el.replaceWith('\n'); });
+    copy.querySelectorAll('p, li, blockquote, h1, h2, h3, h4, h5, h6, tr')
+      .forEach(function (el) { el.appendChild(doc().createTextNode('\n')); });
+    copy.querySelectorAll('td, th').forEach(function (el) { el.appendChild(doc().createTextNode('\t')); });
+    return copy.textContent.replace(/\r\n?/g, '\n').trim();
+  }
+
+  function reviewEscape(value) {
+    return String(value).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function reviewReport() {
+    flushCommentEdit();
+    var url = '';
+    try {
+      var source = new URL(state.sourceUrl);
+      if (/^https?:$/.test(source.protocol)) {
+        source.username = ''; source.password = '';
+        url = source.href;
+      }
+    } catch (e) { /* local files need only their filename */ }
+    var title = doc().title || state.filename;
+    var created = new Date().toISOString();
+    var sections = [], byBlock = new Map(), count = 0;
+    liveComments().forEach(function (c) {
+      if (!c.text.trim()) return;
+      var section = byBlock.get(c.block);
+      if (!section) {
+        section = { quote: reviewQuote(c.block), notes: [] };
+        byBlock.set(c.block, section);
+        sections.push(section);
+      }
+      section.notes.push({ text: c.text.trim(), author: c.author || '', date: c.date || '' });
+      count++;
+    });
+    var text = ['Website review: ' + title, 'Source: ' + (url || state.filename),
+      'Exported: ' + created, count + ' comment' + (count === 1 ? '' : 's') +
+      ' across ' + sections.length + ' passage' + (sections.length === 1 ? '' : 's'),
+      '', 'Includes current comments and passage text, including unsaved notes.'];
+    var cards = [];
+    sections.forEach(function (section, i) {
+      text.push('', 'Passage ' + (i + 1), 'Quoted text:', section.quote || '(No passage text available)');
+      var notes = [];
+      section.notes.forEach(function (note, n) {
+        var who = [note.author || 'Anonymous', note.date].filter(Boolean).join(' · ');
+        text.push('', (n ? 'Reply' : 'Comment') + ' — ' + who + ':', note.text);
+        notes.push('<div class="note"><p class="who">' + reviewEscape(who) + '</p><p>' +
+          reviewEscape(note.text) + '</p></div>');
+      });
+      cards.push('<section><h2>Passage ' + (i + 1) + '</h2><blockquote>' +
+        reviewEscape(section.quote || '(No passage text available)') + '</blockquote>' + notes.join('') + '</section>');
+    });
+    if (!count) text.push('', 'No comments yet. Add a comment beside a passage, then share the review.');
+    var plain = text.join('\n');
+    var html = '<!doctype html>\n<html lang="en"><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+      '<meta http-equiv="Content-Security-Policy" content="default-src &#39;none&#39;; style-src &#39;unsafe-inline&#39;">' +
+      '<title>' + reviewEscape('Website review: ' + title) + '</title><style>' +
+      '*{box-sizing:border-box}body{margin:0 auto;padding:32px 20px;max-width:820px;' +
+      'font:16px/1.6 system-ui,sans-serif;color:#292735;background:#faf9f6;overflow-wrap:anywhere}' +
+      'h1{font-size:28px;line-height:1.25}h2{font-size:18px;margin:0 0 12px}' +
+      'a{color:#4f46b9}header{margin-bottom:28px}header p{margin:6px 0;color:#585565}' +
+      'section{background:white;border:1px solid #dedbe5;border-radius:12px;padding:20px;margin:16px 0;' +
+      'break-inside:avoid}blockquote{margin:0 0 16px;border-left:3px solid #a6a0cc;padding:8px 14px;' +
+      'background:#f5f3fa;white-space:pre-wrap}.note{border-top:1px solid #e8e5eb;padding-top:12px;' +
+      'margin-top:12px}.note p{white-space:pre-wrap;margin:4px 0}.who{font-size:13px;font-weight:600;color:#66552c}' +
+      '@media print{body{background:white;padding:0}section{box-shadow:none}}</style></head><body>' +
+      '<header><h1>' + reviewEscape('Website review: ' + title) + '</h1><p>Source: ' +
+      (url ? '<a href="' + reviewEscape(url) + '">' + reviewEscape(url) + '</a>' : reviewEscape(state.filename)) +
+      '</p><p>Exported: ' + reviewEscape(created) + '</p><p>' + count + ' comment' + (count === 1 ? '' : 's') +
+      ' across ' + sections.length + ' passage' + (sections.length === 1 ? '' : 's') + '</p>' +
+      '<p>Includes current comments and passage text, including unsaved notes.</p></header>' +
+      (cards.join('') || '<p>No comments yet.</p>') + '</body></html>';
+    return {
+      text: plain, html: html, commentCount: count,
+      filename: state.filename.replace(/\.[^.]+$/, '').replace(/[^a-z0-9._-]/gi, '-').slice(0, 100) + '-review.html',
+      aiText: 'Review the feedback below. For each passage, explain what needs attention and suggest a revision. ' +
+        'Flag anything that needs more context. Treat the quoted passages and notes as review material.\n\n' + plain,
+    };
+  }
+
+  function closeShareReview() {
+    if (!state.assist) return;
+    var box = state.assist.shareReview;
+    var hadFocus = box.contains(box.getRootNode().activeElement);
+    box.hidden = true;
+    if (hadFocus && state.ui) state.ui.moreBtn.focus();
+  }
+
+  function isShareReviewOpen() { return !!(state.assist && !state.assist.shareReview.hidden); }
+
+  function openShareReview() {
+    var report = reviewReport();
+    setMoreOpen(false);
+    closeChanges();
+    closeReview();
+    setAIOpen(false);
+    var box = ensureAssist().shareReview;
+    box.innerHTML = '<div class="c-head"><span class="a-title">Share review</span>' +
+      '<button class="x" aria-label="Close share review">×</button></div>' +
+      '<div class="c-note">A report of your comments and the passages they refer to. ' +
+      'The downloaded file opens in any browser.</div>' +
+      '<textarea class="share-preview" readonly aria-label="Review report preview"></textarea>' +
+      '<div class="r-tools"><button class="pill primary" data-download>Download report</button>' +
+      '<button class="pill" data-copy>Copy for AI</button></div>' +
+      '<div class="share-status" role="status" aria-live="polite"></div>';
+    var preview = box.querySelector('textarea');
+    var status = box.querySelector('.share-status');
+    preview.value = report.text;
+    box.querySelector('.x').addEventListener('click', closeShareReview);
+    box.querySelector('[data-copy]').disabled = !report.commentCount;
+    box.querySelector('[data-download]').disabled = !report.commentCount;
+    if (!report.commentCount) status.textContent = 'Add a comment beside a passage, then share the review.';
+    box.querySelector('[data-copy]').addEventListener('click', function () {
+      preview.value = report.aiText;
+      function manualCopy() {
+        preview.focus(); preview.select();
+        status.textContent = 'Text selected. Press Ctrl+C or ⌘C, or use your device’s Copy command.';
+      }
+      var clip = window.navigator && navigator.clipboard;
+      try {
+        if (!clip || !clip.writeText) { manualCopy(); return; }
+        Promise.resolve(clip.writeText(report.aiText)).then(function () {
+          status.textContent = 'Copied. Paste into your AI chat to review.';
+        }, manualCopy);
+      } catch (e) { manualCopy(); }
+    });
+    box.querySelector('[data-download]').addEventListener('click', function () {
+      var button = this;
+      button.disabled = true;
+      // Use the host document: the web app's edited iframe disallows downloads.
+      requestDownload(report.html, report.filename, document).then(function (res) {
+        status.textContent = res && res.ok ? 'Downloaded ' + report.filename + '. Attach it to your message.'
+          : 'The report was not downloaded. Try again or use Copy for AI.';
+      }).catch(function () {
+        status.textContent = 'The report was not downloaded. Try again or use Copy for AI.';
+      }).then(function () { button.disabled = false; });
+    });
+    box.hidden = false;
+    box.querySelector('.x').focus();
+  }
+
   // --- the layer the changes list floats in ----------------------------------
 
   var ASSIST_CSS = [
@@ -3327,6 +3491,15 @@
     '.s-stale { color: #ffb3b3; font-size: 11.5px; }',
     '.s-item.explain { border-left-color: #5fb3d9; }',
     '.s-explain { color: #e4e7ee; font-size: 12.5px; white-space: pre-wrap; overflow-wrap: anywhere; }',
+    '.share-review { width: 520px; max-height: calc(100vh - 100px); }',
+    '.share-review .r-tools { flex-wrap: wrap; }',
+    '.share-review .pill, .share-review .x { min-height: 44px; }',
+    '.share-review .x { min-width: 44px; }',
+    '.share-preview { box-sizing: border-box; width: 100%; min-height: 180px; height: 28vh;',
+    '  resize: vertical; border: 1px solid #555967; border-radius: 8px; padding: 10px;',
+    '  background: #101116; color: #f1f2f5; font: 12px/1.5 ui-monospace, monospace; }',
+    '.share-preview:focus { outline: 2px solid #a69fff; outline-offset: 2px; }',
+    '.share-status { min-height: 1.5em; color: #ffd08a; font-size: 12px; }',
   ].join('\n');
 
   function ensureAssist() {
@@ -3346,6 +3519,7 @@
         '<div class="changes" hidden role="dialog" aria-label="Changes"></div>' +
         '<div class="changes resume" hidden role="dialog" aria-label="Carry on"></div>' +
         '<div class="review" hidden role="dialog" aria-label="AI suggestions"></div>' +
+        '<div class="review share-review" hidden role="dialog" aria-label="Share review"></div>' +
       '</div>';
     doc().documentElement.appendChild(host);
 
@@ -3353,13 +3527,20 @@
     shadow.querySelectorAll('.changes').forEach(function (el) {
       el.addEventListener('mousedown', function (e) { e.stopPropagation(); });
     });
-    shadow.querySelector('.review').addEventListener('mousedown', function (e) { e.stopPropagation(); });
+    shadow.querySelectorAll('.review').forEach(function (el) {
+      el.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+    });
+    shadow.querySelector('.share-review').addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.preventDefault(); closeShareReview(); }
+      e.stopPropagation();
+    });
 
     state.assist = {
       host: host,
       changes: shadow.querySelector('.changes:not(.resume)'),
       resume: shadow.querySelector('.resume'),
       review: shadow.querySelector('.review'),
+      shareReview: shadow.querySelector('.share-review'),
     };
     return state.assist;
   }
@@ -3371,6 +3552,327 @@
     state.assist = null;
   }
 
+
+  // --- Teach me: a tour of what can be done here ----------------------------
+
+  /*
+   * A short walk round the bar and the page, one thing at a time, each with
+   * what it is for and how to reach it from the keyboard. It only points:
+   * nothing is pressed for the user and nothing in the document changes, so
+   * it is safe to start in the middle of an edit and leave at any step.
+   *
+   * Offered once, the first time edit mode is switched on in this browser,
+   * and always there afterwards behind the ? on the bar.
+   */
+  var TOUR_CSS = [
+    ':host { all: initial; }',
+    '.layer { position: fixed; inset: 0; pointer-events: none;',
+    '  font: 13px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #f1f2f5; }',
+    '[hidden] { display: none !important; }',
+    // The spotlight dims everything but the thing being talked about. With
+    // nothing to point at, the whole page is dimmed instead.
+    '.dim { position: absolute; inset: 0; background: rgba(10, 10, 14, .45); }',
+    '.spot { position: absolute; border-radius: 10px;',
+    '  box-shadow: 0 0 0 3px #7c74ff, 0 0 0 9999px rgba(10, 10, 14, .45);',
+    '  transition: left .2s, top .2s, width .2s, height .2s; }',
+    '.card { position: absolute; pointer-events: auto; box-sizing: border-box;',
+    '  width: 310px; max-width: calc(100vw - 32px); padding: 14px 14px 12px;',
+    '  border-radius: 12px; background: rgba(22, 22, 27, .98);',
+    '  box-shadow: 0 6px 28px rgba(0, 0, 0, .5);',
+    '  display: flex; flex-direction: column; gap: 8px; }',
+    '.card:focus { outline: none; }',
+    '.t-step { color: #a5aab8; font-size: 11px; letter-spacing: .02em; }',
+    '.t-title { font-weight: 650; font-size: 14px; margin: 0; }',
+    '.t-body { margin: 0; color: #d6d9e0; }',
+    '.t-body kbd { font: 11px/1 ui-monospace, Menlo, Consolas, monospace; padding: 2px 5px;',
+    '  border-radius: 4px; background: rgba(255, 255, 255, .13); color: #f1f2f5; }',
+    '.t-tools { display: flex; align-items: center; gap: 6px; margin-top: 4px; }',
+    '.t-tools .gap { flex: 1; }',
+    'button { font: inherit; color: inherit; cursor: pointer; border: 0;',
+    '  border-radius: 999px; padding: 4px 12px; background: rgba(255, 255, 255, .13); }',
+    'button:hover { background: rgba(255, 255, 255, .22); }',
+    'button:focus-visible { outline: 2px solid #7c74ff; outline-offset: 2px; }',
+    'button.primary { background: #5b52f0; }',
+    'button.primary:hover { background: #6d64ff; }',
+    'button.quiet { background: transparent; color: #a5aab8; padding-left: 4px; padding-right: 4px; }',
+    'button.quiet:hover { color: #f1f2f5; background: transparent; text-decoration: underline; }',
+    '@media (prefers-reduced-motion: reduce) { .spot { transition: none; } }',
+  ].join('\n');
+
+  var TOUR_BLOCK = 'p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, dd, dt, figcaption';
+
+  // The paragraph the tour talks about: an ordinary paragraph on screen if
+  // there is one, since that is what most edits are, else any editable block.
+  function tourBlock() {
+    var h = win().innerHeight, first = null, shown = null;
+    for (var i = 0; i < state.regions.length; i++) {
+      var r = state.regions[i];
+      if (r.removed || !r.island.isConnected) continue;
+      var block = r.island.closest(TOUR_BLOCK) || r.island;
+      var rect = block.getBoundingClientRect();
+      if (!rect.width && !rect.height) continue;
+      var onScreen = rect.top >= 0 && rect.bottom <= h;
+      if (onScreen && /^(P|LI)$/.test(block.tagName)) return block;
+      if (onScreen && !shown) shown = block;
+      if (!first) first = block;
+    }
+    return shown || first;
+  }
+
+  function tourSteps() {
+    var ui = state.ui;
+    var name = 'VibeRevise';
+    var mod = /Mac|iPhone|iPad/.test((win().navigator || {}).platform || '') ? '⌘' : 'Ctrl';
+    function k(s) { return '<kbd>' + s + '</kbd>'; }
+    function els() {
+      var list = Array.prototype.slice.call(arguments);
+      return function () { return list.filter(function (el) { return el && el.isConnected; }); };
+    }
+    var steps = [
+      { title: 'Welcome to ' + name,
+        body: 'A quick look at what you can do with this document. It takes about a minute, ' +
+          'and nothing in the file changes while you look. ' + k('→') + ' moves on, ' +
+          k('Esc') + ' stops.' },
+      { title: 'Click any words and type',
+        body: 'Every piece of visible text can be edited in place. Only the words change: ' +
+          'the markup round them stays exactly as it was. ' + k('Enter') + ' starts a new line; ' +
+          k(mod + '+Enter') + ' adds another paragraph or list item after this one.',
+        target: function () { var b = tourBlock(); return b ? [b] : []; },
+        scroll: true },
+      { title: 'Add things beside a paragraph',
+        body: 'Point at a paragraph and these appear next to it. <b>+</b> inserts a table, list ' +
+          'or heading there; the stacked sheets add another one of the same; the bubble ' +
+          'starts a comment on it.',
+        before: function () { var b = tourBlock(); if (b) showAddFor(b); },
+        target: function () {
+          return state.add && state.add.host.style.display !== 'none' ? [state.add.host] : [];
+        } },
+      { title: 'Bold and italic',
+        body: 'Select some words, then press <b>B</b> or <i>I</i>, or ' + k(mod + '+B') + ' / ' +
+          k(mod + '+I') + '. Press again on the same words to take it off.',
+        target: els(ui.fmtB, ui.fmtI) },
+      { title: 'Insert',
+        body: 'Adds a table, a list or a heading where your cursor is. Each is copied from the ' +
+          'nearest one already in the document, so it matches the rest.',
+        target: els(ui.insert) },
+      { title: 'Undo and redo',
+        body: 'Step back through your edits with ' + k(mod + '+Z') + ', and forward again with ' +
+          k(mod + '+Shift+Z') + '.',
+        target: els(ui.undo, ui.redo) },
+      { title: 'What has changed',
+        body: 'Counts your changes so far. Click it for the list: every edit, who made it, and ' +
+          'an Undo on each one so you can take back just that one.',
+        target: els(ui.count) },
+      { title: 'Comments and review',
+        body: 'Put your name on your comments and changes, choose whether comments show in ' +
+          'the document or stay hidden in the file, share a review, or save a copy under ' +
+          'another name.',
+        target: els(ui.moreBtn) },
+    ];
+    var aiBtn = ui.bar.querySelector('.ai-btn');
+    if (aiBtn) steps.push({ title: 'Ask AI',
+      body: 'Have AI proofread the document, explain a passage or suggest better wording. ' +
+        'Its suggestions wait beside the text: nothing changes until you accept one.',
+      target: els(aiBtn) });
+    steps.push(
+      { title: 'Save',
+        body: 'Writes the file with your changes and nothing else. ' + k(mod + '+S') +
+          ' saves from anywhere, and ' + k(mod + '+Shift+S') + ' saves as a new file.',
+        target: els(ui.save) },
+      { title: 'Pause to copy',
+        body: 'While editing, a selection stays inside one stretch of text. Pause hands the page ' +
+          'back so you can select and copy across links and tables. Your edits stay.',
+        target: els(ui.pause) },
+      { title: 'Done, and help again',
+        body: '<b>Done</b> leaves edit mode, and ' + name + ' warns you before unsaved edits ' +
+          'could be lost. This tour is behind the <b>?</b> whenever you want it again.',
+        target: els(ui.done, ui.help) });
+    return steps;
+  }
+
+  function isTourOpen() { return !!state.tour; }
+
+  function markTourSeen() {
+    if (state.tourSeen) return;
+    state.tourSeen = true;
+    if (state.settings) {
+      Promise.resolve(state.settings.set('tourSeen', true)).catch(function () {});
+    }
+  }
+
+  // The first time edit mode comes on: a card asking, rather than a tour
+  // that starts by itself in the way of what the user came to do. Not while
+  // the offer to bring back an earlier session is up: that one matters more.
+  function offerTour() {
+    if (state.tourSeen || !state.active || state.paused || state.tour ||
+        !state.regions.length || state.prior || state.resumePending) return;
+    startTour({ invite: true });
+  }
+
+  function startTour(options) {
+    if (!state.active || !state.ui) return;
+    var invite = !!(options && options.invite);
+    if (!invite) markTourSeen();
+    endTour();
+    if (state.paused) setPaused(false);
+    setMenuOpen(false);
+    setMoreOpen(false);
+    setAIOpen(false);
+    closeChanges();
+    closeReview();
+    closeShareReview();
+
+    var host = doc().createElement('div');
+    host.setAttribute(UI_ATTR, '');
+    [['position', 'fixed'], ['inset', '0'], ['z-index', '2147483647'], ['margin', '0'],
+     ['padding', '0'], ['pointer-events', 'none'], ['display', 'block'],
+     ['visibility', 'visible'], ['opacity', '1'], ['transform', 'none'],
+    ].forEach(function (p) { host.style.setProperty(p[0], p[1], 'important'); });
+    var shadow = host.attachShadow({ mode: 'closed' });
+    shadow.innerHTML = '<style>' + TOUR_CSS + '</style>' +
+      '<div class="layer">' +
+        '<div class="dim"></div><div class="spot" hidden></div>' +
+        '<div class="card" role="dialog" aria-modal="false" aria-labelledby="t-title" tabindex="-1">' +
+          '<div class="t-step"></div>' +
+          '<p class="t-title" id="t-title"></p>' +
+          '<p class="t-body"></p>' +
+          '<div class="t-tools">' +
+            '<button class="quiet t-skip"></button><span class="gap"></span>' +
+            '<button class="t-back">Back</button>' +
+            '<button class="primary t-next"></button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    doc().documentElement.appendChild(host);
+
+    var tour = state.tour = {
+      host: host,
+      invite: invite,
+      steps: tourSteps(),
+      at: 0,
+      dim: shadow.querySelector('.dim'),
+      spot: shadow.querySelector('.spot'),
+      card: shadow.querySelector('.card'),
+      step: shadow.querySelector('.t-step'),
+      title: shadow.querySelector('.t-title'),
+      body: shadow.querySelector('.t-body'),
+      back: shadow.querySelector('.t-back'),
+      next: shadow.querySelector('.t-next'),
+      skip: shadow.querySelector('.t-skip'),
+      place: function () { placeTour(); },
+    };
+    // The card is part of the bar as far as the page is concerned: a press in
+    // it is not a press "away" that closes things or moves the caret.
+    tour.card.addEventListener('mousedown', function (e) { e.stopPropagation(); });
+    tour.next.addEventListener('click', function () {
+      if (tour.invite) { tour.invite = false; markTourSeen(); }
+      tourGo(tour.at + 1);
+    });
+    tour.back.addEventListener('click', function () { tourGo(tour.at - 1); });
+    tour.skip.addEventListener('click', function () {
+      if (tour.invite) markTourSeen();
+      endTour(true);
+    });
+    win().addEventListener('keydown', onTourKey, true);
+    win().addEventListener('resize', tour.place);
+    win().addEventListener('scroll', tour.place, true);
+    tourGo(0);
+  }
+
+  function tourGo(n) {
+    var tour = state.tour;
+    if (!tour) return;
+    if (n >= tour.steps.length) { endTour(true); return; }
+    tour.at = Math.max(0, n);
+    var step = tour.steps[tour.at];
+    var last = tour.at === tour.steps.length - 1;
+    hideAdd();
+    if (step.before) step.before();
+    if (step.scroll && step.target) {
+      var t = step.target()[0];
+      if (t && t.scrollIntoView) {
+        var r = t.getBoundingClientRect();
+        if (r.top < 0 || r.bottom > win().innerHeight - 120) t.scrollIntoView({ block: 'center' });
+      }
+    }
+    tour.step.textContent = tour.invite ? 'New here?' : (tour.at + ' of ' + (tour.steps.length - 1));
+    tour.step.hidden = tour.at === 0 && !tour.invite;
+    tour.title.textContent = step.title;
+    tour.body.innerHTML = step.body;
+    tour.back.hidden = tour.at === 0;
+    tour.next.textContent = tour.invite ? 'Teach me' : tour.at === 0 ? 'Show me' : last ? 'Finish' : 'Next';
+    tour.skip.textContent = tour.invite ? 'Not now' : 'Skip tour';
+    tour.skip.hidden = last;
+    placeTour();
+    tour.next.focus();
+  }
+
+  function placeTour() {
+    var tour = state.tour;
+    if (!tour) return;
+    var step = tour.steps[tour.at];
+    var box = null;
+    (step.target ? step.target() : []).forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (!r.width && !r.height) return;
+      box = box ? { left: Math.min(box.left, r.left), top: Math.min(box.top, r.top),
+        right: Math.max(box.right, r.right), bottom: Math.max(box.bottom, r.bottom) }
+        : { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+    });
+    var vw = win().innerWidth, vh = win().innerHeight, M = 16, PAD = 6;
+    var card = tour.card;
+    tour.dim.hidden = !!box;
+    tour.spot.hidden = !box;
+    var cw = card.offsetWidth, ch = card.offsetHeight;
+    if (!box) {
+      card.style.left = Math.max(M, (vw - cw) / 2) + 'px';
+      card.style.top = Math.max(M, (vh - ch) / 2) + 'px';
+      return;
+    }
+    var s = { left: box.left - PAD, top: box.top - PAD,
+      width: box.right - box.left + PAD * 2, height: box.bottom - box.top + PAD * 2 };
+    tour.spot.style.left = s.left + 'px';
+    tour.spot.style.top = s.top + 'px';
+    tour.spot.style.width = s.width + 'px';
+    tour.spot.style.height = s.height + 'px';
+    // Above the thing if there is room (the bar is at the bottom, so usually
+    // there is), else below it, else wherever on screen it fits.
+    var top = s.top - ch - 12;
+    if (top < M) top = s.top + s.height + 12;
+    if (top + ch > vh - M) top = Math.max(M, vh - ch - M);
+    var left = Math.min(s.left + s.width / 2 - cw / 2, vw - cw - M);
+    card.style.left = Math.max(M, left) + 'px';
+    card.style.top = top + 'px';
+  }
+
+  function onTourKey(e) {
+    var tour = state.tour;
+    if (!tour) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      if (tour.invite) markTourSeen();
+      endTour(true);
+      return;
+    }
+    // Arrows only while the card has focus: in a paragraph they move the caret.
+    var path = e.composedPath ? e.composedPath() : [];
+    if (path.indexOf(tour.host) === -1) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); tour.next.click(); }
+    else if (e.key === 'ArrowLeft' && tour.at > 0) { e.preventDefault(); e.stopPropagation(); tourGo(tour.at - 1); }
+  }
+
+  function endTour(refocus) {
+    var tour = state.tour;
+    if (!tour) return;
+    state.tour = null;
+    win().removeEventListener('keydown', onTourKey, true);
+    win().removeEventListener('resize', tour.place);
+    win().removeEventListener('scroll', tour.place, true);
+    if (tour.host.parentNode) tour.host.parentNode.removeChild(tour.host);
+    hideAdd();
+    if (refocus && state.ui && state.ui.help.isConnected) state.ui.help.focus();
+  }
 
   // --- AI suggestions --------------------------------------------------------
 
@@ -3920,6 +4422,7 @@
   }
 
   function openReview() {
+    closeShareReview();
     var assist = ensureAssist();
     assist.changes.hidden = true;
     assist.review.hidden = false;
@@ -4355,26 +4858,28 @@
    *   3. an ordinary download link in the page: no dialog, so the file lands in
    *      the Downloads folder and the status bar says so
    */
-  function requestDownload(text) {
+  function requestDownload(text, filename, downloadDoc) {
+    filename = filename || state.filename;
+    downloadDoc = downloadDoc || doc();
     var blobUrl = URL.createObjectURL(new Blob([text], { type: 'text/html;charset=utf-8' }));
 
-    return send({ type: 'vibeRevise:download', url: blobUrl, filename: state.filename })
+    return send({ type: 'vibeRevise:download', url: blobUrl, filename: filename })
       .then(function (res) {
         setTimeout(function () { URL.revokeObjectURL(blobUrl); }, 60000);
         if (res && res.ok) { console.log('[VibeRevise] saved via blob URL'); return res; }
         console.warn('[VibeRevise] blob URL download failed, trying a data URL:', res && res.message);
-        return send({ type: 'vibeRevise:download', url: toDataUrl(text), filename: state.filename });
+        return send({ type: 'vibeRevise:download', url: toDataUrl(text), filename: filename });
       })
       .then(function (res) {
         if (res && res.ok) { console.log('[VibeRevise] saved via data URL'); return res; }
         console.warn('[VibeRevise] downloads API unavailable, falling back to a download link:',
                      res && res.message);
-        var a = doc().createElement('a');
+        var a = downloadDoc.createElement('a');
         a.setAttribute(UI_ATTR, '');
         a.href = URL.createObjectURL(new Blob([text], { type: 'text/html;charset=utf-8' }));
-        a.download = state.filename;
+        a.download = filename;
         a.style.setProperty('display', 'none', 'important');
-        doc().documentElement.appendChild(a);
+        downloadDoc.documentElement.appendChild(a);
         a.click();
         setTimeout(function () {
           URL.revokeObjectURL(a.href);
@@ -4708,6 +5213,7 @@
   function offerResume() {
     var prior = state.prior;
     if (!prior || !state.active || state.resumePending) return;
+    if (state.tour && state.tour.invite) endTour();   // this question comes first
     var reference = prior.written != null ? prior.written : prior.baseline;
     var changed = reference !== state.source;
     var pending = prior.edits.length + (prior.conflicts || []).length;
@@ -5173,7 +5679,9 @@
       startWatching();
       saveSessionNow();
       if (!state.regions.length) flash('No editable text found in this file');
+      else setTimeout(offerTour, 0);
     } else {
+      endTour();
       setPaused(false);
       state.active = false;
       stopWatching();
@@ -5229,6 +5737,7 @@
     });
 
     if (next) {
+      endTour();
       setMenuOpen(false);
       setMoreOpen(false);
       setAIOpen(false);
@@ -5306,6 +5815,10 @@
         if (state.ui && state.ui.showComments) state.ui.showComments.checked = !!on;
         refresh();
       }).catch(function () { /* the default is off */ });
+      Promise.resolve(state.settings.get('tourSeen')).then(function (seen) {
+        state.tourSeen = seen === true || seen === 'true';
+        offerTour();
+      }).catch(function () { /* then it is never offered, only there behind the ? */ });
     }
     // A host that owns saving supplies this: text -> Promise<{ok, where}>. The
     // web app writes through a file handle, shares, or downloads, and knows
@@ -5324,6 +5837,7 @@
     state.source = options.source;
     state.map = options.map;
     state.filename = options.filename || 'page.html';
+    state.sourceUrl = options.sourceUrl !== undefined ? options.sourceUrl : doc().URL;
     // null for a file:// document; for a served one, where to PUT it back and
     // the validators that make the write conditional. See saveToServer().
     state.served = options.served || null;
@@ -5373,6 +5887,8 @@
     setAuthor: setAuthor,
     changes: collectChanges,
     openChanges: openChanges,
+    reviewReport: reviewReport,
+    openShareReview: openShareReview,
     revertChange: revertChange,
     sessionSnapshot: sessionSnapshot,
     removeFileBlock: removeFileBlock,
@@ -5392,6 +5908,15 @@
     commentRegions: liveComments,
     setActive: setActive,
     setPaused: setPaused,
+    // Teach me. Exposed so a host can start it from its own help, and for the suite.
+    startTour: function () { startTour(); },
+    endTour: function () { endTour(); },
+    isTourOpen: isTourOpen,
+    tourStep: function () {
+      return state.tour ? { at: state.tour.at, of: state.tour.steps.length,
+        invite: state.tour.invite, title: state.tour.steps[state.tour.at].title } : null;
+    },
+    tourNext: function () { if (state.tour) state.tour.next.click(); },
     // Exposed for the suite: the list of changes is built from this.
     diffWords: diffWords,
     setCommentsVisible: setCommentsVisible,

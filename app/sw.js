@@ -17,13 +17,15 @@
 
 // Bump this to retire the previous cache. It is the app's shell version, not
 // the extension's.
-const CACHE = 'viberevise-shell-v10';
+const CACHE = 'viberevise-shell-v13';
 
 const SHELL = [
   'index.html',
   'app.css',
   'app.js',
   'manifest.webmanifest',
+  'sample.html',
+  'lib/errors.js',
   'lib/tokenizer.js',
   'lib/splice.js',
   'lib/origins.js',
